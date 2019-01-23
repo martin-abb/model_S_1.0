@@ -61,3 +61,22 @@ f4=figure;
 image(img_proc_pick);
 title('MIT Princeton Pick Points')
 
+%----------------------------------------------------------------------
+
+[worldX,worldY, worldZ] = project_D_to_XYZ(inputDepth,cameraIntrinsics,cameraPose);
+
+%----------------------------------------------------------------------
+f5=figure;
+cld_world   = plot3(worldX, worldY, worldZ, 'k.');
+
+colormap('gray')
+
+%xlim([-1 1])
+%ylim([-1 1])
+%zlim([-0.5 0.5])
+axis equal
+xlabel('x')
+ylabel('y')
+title('World 3D Point Cloud')
+
+
