@@ -1,7 +1,7 @@
 function [worldX,worldY, worldZ] = project_D_to_XYZ(inputDepth,cameraIntrinsics,cameraPose)
 %project_D_to_XYZ Project depth map into 3D point cloud
 
-[NY,NX]=size(inputDepth)
+[NY,NX]=size(inputDepth);
 
 raw_ind_x   = 1:NX;
 raw_ind_y   = 1:NY;
