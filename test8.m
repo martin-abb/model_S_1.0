@@ -6,6 +6,14 @@
 %
 %   2019-01-23      v8
 
+%   Define running mode
+
+script_flag = 1;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
+% 0 - DO plot individual point cloud plots
+
+plot_PC_overlay = 0;    % 1 - DO plot point cloud with suction cup lip points overlaid
+% 0 - DO NOT plot the enhanced point cloud
+
 %----------------------------------------------------------------------
 %   Define suction cup parameters
 %
@@ -25,9 +33,42 @@ Bin.BH          = 220*mm;       % Bin dimensions Width x Length, Height, Origin
 Bin.X           = 0.000;        % Bin origin
 Bin.Y           = 0.000;
 Bin.Z           = 0.000;
-Bin.dx          = 0.1;          % tolerance around bin limits to use for pick point filtering
-Bin.dy          = 0.1;
-Bin.dz          = 0.1;
+
+% Bin.dx          = 0.1;          % tolerance around bin limits to use for pick point filtering
+% Bin.dy          = 0.1;
+% Bin.dz          = 0.1;
+
+Bin.dx          = Suction.RO;          % tolerance around bin limits to use for pick point filtering
+Bin.dy          = Suction.RO;
+Bin.dz          = 0.01;
+
+%   The ranges below were used for point cloud axis limits, extend BEYOND
+%   bin
+% Bin.X_min                 = Bin.X - Bin.dx;
+% Bin.X_max                 = Bin.X + Bin.BW + Bin.dx;
+% 
+% Bin.Y_min                 = Bin.Y - Bin.dy;
+% Bin.Y_max                 = Bin.Y + Bin.BL + Bin.dy;
+% 
+% Bin.Z_min                 = Bin.Z - Bin.dz;
+% Bin.Z_max                 = Bin.Z + Bin.BH + Bin.dz;
+
+%   Use these ranges for checking if pick point inside bin, REDUCE the bin
+%   size instead of extending
+
+Bin.X_min                 = Bin.X + Bin.dx;
+Bin.X_max                 = Bin.X + Bin.BW - Bin.dx;
+
+Bin.Y_min                 = Bin.Y + Bin.dy;
+Bin.Y_max                 = Bin.Y + Bin.BL - Bin.dy;
+
+Bin.Z_min                 = Bin.Z + Bin.dz;
+Bin.Z_max                 = Bin.Z + Bin.BH - Bin.dz;
+
+%----------------------------------------------------------------------
+%   Define grasp quality evaluation parameters
+%
+Std_Bad      = 0.120; %***0.030;           % standard deviation for pick points to be flagged as BAD
 
 %----------------------------------------------------------------------
 %   Load sensor data images for testing
@@ -136,8 +177,8 @@ PickPoints   = PickPoints_Bin24_RAW(:, 1:3)*mm;
 %----------------------------------------------------------------------
 %   Generate pick points for heat map
 
-NskipX          = 10;   % pixel spacing between pick points to evaluate
-NskipY          = 10;
+NskipX          = 5%200%10;   % pixel spacing between pick points to evaluate
+NskipY          = 5%200%10;
 
 [PickPoints,pick_set_X,pick_set_Y]    = Generate_Pick_Points(NskipX, NskipY, worldX, worldY, worldZ);
 
@@ -148,7 +189,11 @@ NskipY          = 10;
 
 %***[PickPoints_Bin,pick_set_X_Bin,pick_set_Y_Bin]    = Filter_Bin_Pick_Points(PickPoints, Bin);
 
-[PickPoints_Bin,pick_rows]    = Filter_Bin_Pick_Points(PickPoints, Bin);
+if 0, %*** CAN'T FILTER IN ORDER TO GET A RECTANGULAR HEAT MAP BACK, SEE COMMENTS BELOW
+    [PickPoints_Bin,pick_rows]    = Filter_Bin_Pick_Points(PickPoints, Bin);
+else
+    PickPoints_Bin          = PickPoints;
+end
 
 
 %----------------------------------------------------------------------
@@ -162,34 +207,13 @@ cld_Pick_Bin            = plot3(PickPoints_Bin_X, PickPoints_Bin_Y, PickPoints_B
 axis equal
 colormap('gray')
 
-X_min               = Bin.X - Bin.dx;
-X_max               = Bin.X + Bin.BW + Bin.dx;
+plot_X_range = [ Bin.X - 0.1 Bin.X + Bin.BW + 0.1 ];
+plot_Y_range = [ Bin.Y - 0.1 Bin.Y + Bin.BL + 0.1 ];
+plot_Z_range = [ Bin.Z - 0.1 Bin.Z + Bin.BH + 0.1 ];
 
-Y_min               = Bin.Y - Bin.dy;
-Y_max               = Bin.Y + Bin.BL + Bin.dy;
-
-Z_min               = Bin.Z - Bin.dz;
-Z_max               = Bin.Z + Bin.BH + Bin.dz;
-
-
-
-X_min                 = Bin.X - Bin.dx;
-X_max                 = Bin.X + Bin.BW + Bin.dx;
-
-Y_min                 = Bin.Y - Bin.dy;
-Y_max                 = Bin.Y + Bin.BL + Bin.dy;
-
-Z_min                 = Bin.Z - Bin.dz;
-Z_max                 = Bin.Z + Bin.BH + Bin.dz;
-
-
-X_range = [ X_min X_max ];
-Y_range = [ Y_min Y_max ];
-Z_range = [ Z_min Z_max ];
-
-xlim(X_range)
-ylim(Y_range)
-zlim(Z_range)
+xlim(plot_X_range)
+ylim(plot_Y_range)
+zlim(plot_Z_range)
 
 xlabel('x')
 ylabel('y')
@@ -203,6 +227,8 @@ title('Pick Points 3D Point Cloud')
 
 N_pick          = length(PickPoints_Bin);
 PickMetrics     = NaN(N_pick, N_metrics);   %   Matrix to store all evaluation metrics
+
+disp([ 'Total number of pick points: ' num2str(N_pick) ]);
 
 for pick_point_no = 1:N_pick,
     if mod(pick_point_no, 100) == 0,
@@ -225,7 +251,7 @@ for pick_point_no = 1:N_pick,
     %   at the pick point location, i.e. a relative pick point point cloud
     
     
-    [ Pick_PC_Rel_X, Pick_PC_Rel_Y, Pick_PC_Rel_Z ] = Transform_PC(WorldX, WorldY, WorldZ, PickPose);
+    [ Pick_PC_Rel_X, Pick_PC_Rel_Y, Pick_PC_Rel_Z ] = Transform_PC(worldX, worldY, worldZ, PickPose);
     
     %   Select the point cloud that corresponds to the projection of the
     %   suction cup lip
@@ -233,6 +259,9 @@ for pick_point_no = 1:N_pick,
     %   the lip area
     
     [ lipX, lipY, lipZ ]            = Extract_Lip( Pick_PC_Rel_X, Pick_PC_Rel_Y, Pick_PC_Rel_Z, Suction);
+    %*** expand Extract_Lip function to also return the indices of
+    % extracted points for subsequent processing and set removal of these
+    % points from the World 3D Point Cloud for plotting purposes
     
     Std1=std(lipZ);        % Metric 1 - total Z-height standard deviation
     
@@ -243,11 +272,147 @@ for pick_point_no = 1:N_pick,
     
     %   Centerline circle is CM
     
-    Suction.RM = mean([ Suction.RI Suction.RO]);    % mean suction cup lib radius
+    Suction.RM      = mean([ Suction.RI Suction.RO]);    % mean suction cup lib radius
+    Suction.Rcheck  = (Suction.RO - Suction.RI)/2;      % radius distance to check around for lip points, half of the suction lip width
     
-    [CMx, CMy]  = circle(Suction.RM);
-    Lip_Complete_Flag = true;
-    %*** replace wtih Lip_Complete_Flag = Lip_Complete_Check( lipX, lipY,
-    %lipZ, CMx, CMy, Rcheck)
+    %***    Lip_Complete_Flag = true;
+    Lip_Complete_Flag = Lip_Complete_Check( lipX, lipY, lipZ, Suction);
+    
+    if Lip_Complete_Flag,
+        Std1 = Std_Bad;
+    end
+    
+    [PickPoint_Bin,rows]  = Filter_Bin_Pick_Points(PickPoint, Bin);
+    
+    %----------------------------------------------------------------------
+    %   Check if pick point is within bin limits
+
+    if isempty(PickPoint_Bin),
+        Std1 = Std_Bad;
+    end
     
     
+    %----------------------------------------------------------------------
+    %   Sort lipZ values along lip angle
+    
+    [lipZSorted, lipAngles ] = Sort_Lip_Z(lipX, lipY, lipZ, Suction);
+    
+    %----------------------------------------------------------------------
+    
+    if ~script_flag,
+        f7      = figure;
+        plot(lipZSorted)
+        title(['Suction cup lip Z-heights for Pick Point ' num2str(pick_point_no) ])
+    end
+    
+    %----------------------------------------------------------------------
+    
+    if ~script_flag,
+        f8      = figure;
+        
+        subplot(221)
+        plot3(lipX + PickPoint(1), lipY + PickPoint(2), lipZ + PickPoint(3), 'r.');
+        t81=text(PickPoint(1),PickPoint(2),PickPoint(3),num2str(pick_point_no));
+        xlabel('x')
+        ylabel('y')
+        view(3)
+        title([ 'Pick Point number ' num2str(pick_point_no) ])
+        
+        subplot(222)
+        plot3(lipX + PickPoint(1), lipY + PickPoint(2), lipZ + PickPoint(3), 'r.');
+        t82=text(PickPoint(1),PickPoint(2),PickPoint(3),num2str(pick_point_no));
+        xlabel('x')
+        ylabel('y')
+        view(0, 90)
+        title('From top')
+        
+        subplot(223)
+        plot3(lipX + PickPoint(1), lipY + PickPoint(2), lipZ + PickPoint(3), 'r.');
+        t83=text(PickPoint(1),PickPoint(2),PickPoint(3),num2str(pick_point_no));
+        xlabel('x')
+        ylabel('y')
+        view(90,0)
+        title('From side')
+        
+        subplot(224)
+        t84=text(PickPoint(1),PickPoint(2),PickPoint(3),num2str(pick_point_no));
+        plot3(lipX + PickPoint(1), lipY + PickPoint(2), lipZ + PickPoint(3), 'r.');
+        xlabel('x')
+        ylabel('y')
+        view(0,0)
+        title('From front')
+    end
+    
+    if plot_PC_overlay,
+        figure(f5);
+        hold on
+        plot3(lipX + PickPoint(1), lipY + PickPoint(2), lipZ + PickPoint(3), 'r.');
+        t81=text(PickPoint(1),PickPoint(2),PickPoint(3),num2str(pick_point_no));
+    end
+    
+    %----------------------------------------------------------------------
+    %   Save metrics for this pick point
+    
+    PickMetrics(pick_point_no, 1)       = Std1;
+end
+
+%----------------------------------------------------------------------
+%   Process metrics
+
+NX          = length(pick_set_X);
+NY          = length(pick_set_Y);
+M1          = PickMetrics(:,1);
+M1_min      = min(M1);
+M1_max      = max(M1);
+M1_delta    = M1_max - M1_min;
+
+M1_scaled   = (1 - (M1 - M1_min)/M1_delta);
+Image_M1    = reshape(M1_scaled, NY, NX)*63;
+
+
+%*** Do note that to get a rectangular metrics image back,
+%*** I CAN'T filter out pick points in the image that are OUTSIDE THE BIN,
+%*** ALL pickpoints in the 2D grid HAVE TO BE USED!!
+%*** That means the line
+%*** [PickPoints_Bin,pick_rows]    = Filter_Bin_Pick_Points(PickPoints, Bin);
+%*** above CAN'T be used!
+
+
+%----------------------------------------------------------------------
+%   Plot RAW heat map
+f9 = figure;
+image(Image_M1)
+colormap hot
+title('RAW Heat Map')
+
+
+%----------------------------------------------------------------------
+%   Generate large heat map images, of same size as original camera images
+%   so that they can be displayed overlaid on top of each other
+
+Image_M1_Large      = Image_Block_Expand(Image_M1, NskipX, NskipY);
+
+
+%----------------------------------------------------------------------
+%   Plot heat map overlaid on original RGB image with linear ramp heat map
+%
+
+f10 = figure;
+
+
+h_f10_imraw     = image(img_raw_color);
+hold on
+h_f10_im1       = image(Image_M1_Large);
+
+set(h_f10_imraw,'AlphaData', 0.5);
+set(h_f10_im1,'AlphaData', 0.5);
+
+Ntop    = 20;
+
+map     = [ zeros(64-Ntop,1); [(1/Ntop):1/Ntop:1]']*[1 1 0];
+
+map2    = [     ones(64-Ntop,1) * [0 0 1] ;
+                [(1/Ntop):1/Ntop:1]'*[1 1 0] ; ...
+          ];
+colormap(map)
+title(['RAW Heat Map Overlay with LINEAR ramp color map with Ntop = ' num2str(Ntop) ])

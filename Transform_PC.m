@@ -1,4 +1,4 @@
-function [Pick_PC_Rel_X, Pick_PC_Rel_Y, Pick_PC_Rel_Z ] = Transform_PC(WorldX, WorldY, WorldZ, PickPose)
+function [Pick_PC_Rel_X, Pick_PC_Rel_Y, Pick_PC_Rel_Z ] = Transform_PC(worldX, worldY, worldZ, PickPose)
 %Transform_PC Transform input point cloud to a relative point cloud around
 %the pick point and approach angle specified in PickPose
 %   Detailed explanation goes here

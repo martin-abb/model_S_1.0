@@ -3,16 +3,6 @@ function [PickPoints_Bin,rows]  = Filter_Bin_Pick_Points(PickPoints, Bin)
 %Filter_Bin_Pick_Points Remove all pick points that are outside the bin
 %(within tolerances Bin.dx, dy, dz)
 
-X_min                 = Bin.X - Bin.dx;
-X_max                 = Bin.X + Bin.BW + Bin.dx;
-
-Y_min                 = Bin.Y - Bin.dy;
-Y_max                 = Bin.Y + Bin.BL + Bin.dy;
-
-Z_min                 = Bin.Z - Bin.dz;
-Z_max                 = Bin.Z + Bin.BH + Bin.dz;
-
-
 PX                  = PickPoints(:,1);
 PY                  = PickPoints(:,2);
 PZ                  = PickPoints(:,3);
@@ -38,9 +28,9 @@ PZ                  = PickPoints(:,3);
 %
 
 rows = find( ...
-    (PX >= X_min) & (PX <= X_max) & ...
-    (PY >= Y_min) & (PY <= Y_max) & ...
-    (PZ >= Z_min) & (PZ <= Z_max) );
+    (PX >= Bin.X_min) & (PX <= Bin.X_max) & ...
+    (PY >= Bin.Y_min) & (PY <= Bin.Y_max) & ...
+    (PZ >= Bin.Z_min) & (PZ <= Bin.Z_max) );
 
 
 % The syntax below DOES NOT WORK, RETURNS SQUARE matrices with N*N
