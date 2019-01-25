@@ -1,4 +1,4 @@
-function [lipZSorted, lipAngles, lipZ_sort_indices ] = Sort_Lip_Z(lipX, lipY, lipZ, Suction)
+function [lipZSorted, Sortangles, lipZ_sort_indices ] = Sort_Lip_Z(lipX, lipY, lipZ, Suction)
 %Sort_Lip_Z Sort the extracted lip Z-height values by angle for suction cup
 %center
 

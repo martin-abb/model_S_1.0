@@ -1,5 +1,5 @@
 %
-%   test10.m
+%   test11.m
 %
 %   Testing of Suction 1.0
 %   Martin Krucinski
@@ -8,17 +8,19 @@
 %   2019-01-24      v9  Added subtraction of point clouds for pick point
 %                       lips to increase their visibility
 %   2019-01-25      v10 Speed ups for dense heat map generation
+%   2019-01-25      v11 Include frequency / slope effect of the tangential
+%                       direction of the suction cup lip
 
 %   Define running mode
 
-script_flag = 1;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
+script_flag = 0;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
 % 0 - DO plot individual point cloud plots
 
-plot_PC_overlay = 0;    % 1 - DO plot point cloud with suction cup lip points overlaid
+plot_PC_overlay = 1;    % 1 - DO plot point cloud with suction cup lip points overlaid
 % 0 - DO NOT plot the enhanced point cloud
 
-NskipX          = 5%200%10;   % pixel spacing between pick points to evaluate
-NskipY          = 5%200%10;
+NskipX          = 200%10;   % pixel spacing between pick points to evaluate
+NskipY          = 200%10;
 
 %----------------------------------------------------------------------
 %   Define suction cup parameters
@@ -89,7 +91,7 @@ inputDepth      = double(img_raw_depth)*depth_scale;
 cameraIntrinsics    = load('test-camera-intrinsics.txt','ascii');
 cameraPose          = load('test-camera-pose.txt','ascii');
 
-N_metrics           = 1;    % number of metrics to record for each pick point
+N_metrics           = 2;    % number of metrics to record for each pick point
 
 Suction_Cup_Check = true;
 
@@ -340,7 +342,15 @@ for pick_point_no = 1:N_pick,
     %----------------------------------------------------------------------
     %   Sort lipZ values along lip angle
     
-    [lipZSorted, lipAngles ] = Sort_Lip_Z(lipX, lipY, lipZ, Suction);
+    [lipZSorted, lipAngles, lipZ_sort_indices ] = Sort_Lip_Z(lipX, lipY, lipZ, Suction);
+
+    
+    %----------------------------------------------------------------------
+    %  Include frequency / slope effect of the tangential
+    %  direction of the suction cup lip
+    
+    
+    
     
     %----------------------------------------------------------------------
     
@@ -348,10 +358,20 @@ for pick_point_no = 1:N_pick,
         f7      = figure;
         plot(lipZSorted)
         title(['Suction cup lip Z-heights for Pick Point ' num2str(pick_point_no) ])
+        xlabel('lip angle sequence #')
     end
     
     %----------------------------------------------------------------------
     
+    
+    if ~script_flag,
+        f7b      = figure;
+        plot(lipAngles, lipZSorted)
+        title(['Suction cup lip Z-heights for Pick Point ' num2str(pick_point_no) ])
+        xlabel('lip angle [rad]')
+    end
+    
+    %----------------------------------------------------------------------   
     if ~script_flag,
         f8      = figure;
         
@@ -607,7 +627,7 @@ title(['RAW Heat Map (abs scaled) Overlay with LINEAR ramp color map with Ntop =
 f14 = figure;
 
 Nsmooth     = 5;
-t1=Nsmooth^(1/Nsmooth);
+t1=NskipX^(1/Nsmooth);
 
 imgA        = Image_M1_abs_scaled;
 imgB        = imgA;
