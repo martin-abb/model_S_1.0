@@ -13,14 +13,14 @@
 
 %   Define running mode
 
-script_flag = 0;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
+script_flag = 1;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
 % 0 - DO plot individual point cloud plots
 
-plot_PC_overlay = 1;    % 1 - DO plot point cloud with suction cup lip points overlaid
+plot_PC_overlay = 0;    % 1 - DO plot point cloud with suction cup lip points overlaid
 % 0 - DO NOT plot the enhanced point cloud
 
-NskipX          = 200%10;   % pixel spacing between pick points to evaluate
-NskipY          = 200%10;
+NskipX          = 3%200%10;   % pixel spacing between pick points to evaluate
+NskipY          = 3%00%10;
 
 %----------------------------------------------------------------------
 %   Define suction cup parameters
