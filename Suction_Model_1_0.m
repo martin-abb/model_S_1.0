@@ -73,17 +73,21 @@ end
 
 %   replicate value at index  (N_segments - 1) for the last value at
 %   (N_segments)
+%    **** ACTUALLY THIS IS WRONG!
+%    **** REPLICATE THE 1st value instead so that we can detect a sharp
+%    step right at the end!
 
 lipZ_avg_tangential(N_segments)  = lipZ_avg_tangential(N_segments-1);
 lipZ_std_tangential(N_segments)  = lipZ_std_tangential(N_segments-1);
 
 %   differentiate along the tangential direction
-dlipZ_avg_tangential             = [ diff(lipZ_avg_tangential)/dtheta 0];
+dlipZ_avg_tangential             = [ diff(lipZ_avg_tangential)/dtheta ; 0];
 
 %   find max slope
 max_dlipZ           = max(dlipZ_avg_tangential);
 
-Score               = 1 - atan( max_dlipZ / max_slope * slope_factor ) ;
+Score               = 1 - ( atan( max_dlipZ / max_slope * slope_factor ) / (pi/2)  / 2 + 0.5);
 
+5+3;
 end
 
