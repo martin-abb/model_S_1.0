@@ -548,7 +548,7 @@ if plot_PC_overlay,
             PickPoints_Bin(pick_point_no,3), ...
             [ num2str(pick_point_no) ' : ' num2str(M1(pick_point_no)) ] );
         set(t91,'FontWeight','Bold');
-        set(t91,'Color','b');
+        set(t91,'Color','g');
     end
     hold off
     
