@@ -9,11 +9,13 @@ function Score = Suction_Model_1_0( lipX, lipY, lipZ, Suction)
 
 %   Analyze lip segments in an angle increment of dtheta
 
+debug = 0;
+
 N_segments      = 100;
 dtheta          = 2*pi/100;
 
 deg             = pi/180;
-max_slope       = 10e-3/(45*deg);       % max slope is 10 mm per 45 degree, *** NEEDS CALIBRATION ***
+max_slope       = 100e-3/(45*deg); %***10e-3/(45*deg);       % max slope is 10 mm per 45 degree, *** NEEDS CALIBRATION ***
 slope_factor    = 1;                    % tuning factor as to how fast the score changes from 1 to 0 in the transition
 % region from low slope (dlipZ) to
 % high slope
@@ -93,7 +95,6 @@ Score               = 1 - ( atan( max_dlipZ / max_slope * slope_factor ) / (pi/2
 
 %--------------------------------------------------------------------------
 
-debug = 1;
 if debug,
     figure
     set(gcf, 'DefaultLineLineWidth',3);

@@ -15,17 +15,17 @@
 
 %   Define running mode
 
-script_flag = 0;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
+script_flag = 1;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
 % 0 - DO plot individual point cloud plots
 
-plot_PC_overlay = 1;    % 1 - DO plot point cloud with suction cup lip points overlaid
+plot_PC_overlay = 0;    % 1 - DO plot point cloud with suction cup lip points overlaid
 % 0 - DO NOT plot the enhanced point cloud
 
-click_to_point = 1;     % 1 - click in image to analyze pick-point
+click_to_point = 0;     % 1 - click in image to analyze pick-point
 % 0 - run normal, scripted pick-point selection
 
-NskipX          = 3%200%10;   % pixel spacing between pick points to evaluate
-NskipY          = 3%00%10;
+NskipX          = 5%200%10;   % pixel spacing between pick points to evaluate
+NskipY          = 5%200%10;
 
 %----------------------------------------------------------------------
 %   Define suction cup parameters
@@ -33,8 +33,8 @@ NskipY          = 3%00%10;
 in      = 0.0254;
 mm      = 1e-3;
 
-Suction.RO      = 20*mm %*****47/2*mm;        %   Suction cup OUTER radius
-Suction.RI      = 15*mm %***35/2*mm;        %   Suction cup INNER radius, lip width approx. 5 mm
+Suction.RO      = 47/2*mm;  %20*mm %*****47/2*mm;        %   Suction cup OUTER radius
+Suction.RI      = 35/2*mm;  %15*mm %***35/2*mm;        %   Suction cup INNER radius, lip width approx. 5 mm
 
 %----------------------------------------------------------------------
 %   Define bin parameters
@@ -53,7 +53,7 @@ Bin.Z           = 0.000;
 
 Bin.dx          = Suction.RO;          % tolerance around bin limits to use for pick point filtering
 Bin.dy          = Suction.RO;
-Bin.dz          = 0.01;
+Bin.dz          = 0.020;%****0.01;
 
 %   The ranges below were used for point cloud axis limits, extend BEYOND
 %   bin
@@ -87,14 +87,31 @@ Std_Bad      = 0.150; %***0.030;           % standard deviation for pick points 
 %   Load sensor data images for testing
 %
 
-img_raw_color   = imread('24_image_raw.color.png');
-img_raw_depth   = imread('24_image_raw.depth.png');
-img_proc_pick   = imread('24_image_proc.pickpoint.png');
+%***img_name        = '24_image_';
+%***img_name        = '36_image_';
+img_name        = '32_image_';
+
+img_raw_color   = imread([ img_name 'raw.color.png' ]);
+img_raw_depth   = imread([ img_name 'raw.depth.png' ]);
+img_proc_pick   = imread([ img_name 'proc.pickpoint.png' ]);
 depth_scale     = 1/10^4;
 inputDepth      = double(img_raw_depth)*depth_scale;
 
 cameraIntrinsics    = load('test-camera-intrinsics.txt','ascii');
 cameraPose          = load('test-camera-pose.txt','ascii');
+
+%----------------------------------------------------------------------
+%   Load / convert ALTERNATE sensor images to use
+
+temp1           = imread('test_002_Color.png');
+img_raw_color   = imresize(temp1,0.500,'bilinear');
+img_raw_depth   = imread('test_002_Depth.png');
+
+disp([ 'Size of img_raw_color = ' num2str(size(img_raw_color)) ]);
+disp([ 'Size of img_raw_depth = ' num2str(size(img_raw_depth)) ]);
+
+%----------------------------------------------------------------------
+
 
 N_metrics           = 2;    % number of metrics to record for each pick point
 
@@ -320,8 +337,11 @@ for pick_point_no = 1:N_pick,
     
     all_Lip_Complete_Flag(pick_point_no) = Lip_Complete_Flag;
     
+    Score = Suction_Model_1_0( lipX, lipY, lipZ, Suction);
+    
     if ~Lip_Complete_Flag,
         Std1 = Std_Bad;
+        Score   = 0.00;
     end
     
     %   Try direct implementation instead of function to check speed
@@ -336,7 +356,8 @@ for pick_point_no = 1:N_pick,
         %   Check if pick point is within bin limits
         
         if isempty(PickPoint_Bin),
-            Std1 = Std_Bad;
+            Std1    = Std_Bad;
+            Score   = 0.00;
         end
     else
         
@@ -345,7 +366,8 @@ for pick_point_no = 1:N_pick,
         if ~( (PX >= Bin.X_min) & (PX <= Bin.X_max) & ...
                 (PY >= Bin.Y_min) & (PY <= Bin.Y_max) & ...
                 (PZ >= Bin.Z_min) & (PZ <= Bin.Z_max) ),
-            Std1 = Std_Bad;
+            Std1    = Std_Bad;
+            Score   = 0.00;
         end
         
     end
@@ -432,6 +454,7 @@ for pick_point_no = 1:N_pick,
     %   Save metrics for this pick point
     
     PickMetrics(pick_point_no, 1)       = Std1;
+    PickMetrics(pick_point_no, 2)       = Score;
 end
 
 %----------------------------------------------------------------------
@@ -453,9 +476,13 @@ M1_max_abs  = 0.050;    % Absolute, max variation that suction cup can pick up
 
 M1_abs_scaled      = min(1.0, max((1 - (M1 - M1_min)/(M1_max_abs - M1_min)),0));
 
+M2          = PickMetrics(:,2);
+
 if ~click_to_point,
     Image_M1_scaled    = reshape(M1_scaled, NY, NX)*63;
     Image_M1_abs_scaled    = reshape(M1_abs_scaled, NY, NX)*63;
+
+    Image_M2           = reshape(M2, NY, NX)*63;
 end
 
 
@@ -546,7 +573,7 @@ if plot_PC_overlay,
         t91=text(PickPoints_Bin(pick_point_no,1), ...
             PickPoints_Bin(pick_point_no,2), ...
             PickPoints_Bin(pick_point_no,3), ...
-            [ num2str(pick_point_no) ' : ' num2str(M1(pick_point_no)) ] );
+            [ num2str(pick_point_no) ' : ' num2str(M1(pick_point_no))  ' : ' num2str(M2(pick_point_no)) ] );
         set(t91,'FontWeight','Bold');
         set(t91,'Color','g');
     end
@@ -588,7 +615,9 @@ if ~click_to_point,
     Image_M1_scaled_Large      = Image_Block_Expand(Image_M1_scaled, NskipX, NskipY);
     Image_M1_abs_scaled_Large  = Image_Block_Expand(Image_M1_abs_scaled, NskipX, NskipY);
     
-    
+    Image_M2_Large              = Image_Block_Expand(Image_M2, NskipX, NskipY);
+
+        
     %----------------------------------------------------------------------
     %   Plot heat map overlaid on original RGB image with linear ramp heat map
     %
@@ -666,5 +695,26 @@ if ~click_to_point,
     colormap(map2)
     title(['SMOOTHED Heat Map (abs scaled) Overlay with LINEAR ramp color map with Ntop = ' num2str(Ntop) ])
     
+    %----------------------------------------------------------------------
+    %   Plot heat map overlaid on original RGB image based on 
+    %   ABB Suction 1.0 model score
+    %
+    
+    f15 = figure;
+    
+    
+    h_f15_imraw     = image(img_raw_color);
+    hold on
+    h_f15_im1       = image(Image_M2_Large);
+    
+    set(h_f15_imraw,'AlphaData', 0.5);
+    set(h_f15_im1,'AlphaData', 0.5);
+    
+    Ntop    = 20;
+
+    colormap(map2)
+    title(['Suction 1.0 Heat Map LINEAR ramp color map with Ntop = ' num2str(Ntop) ])
+    
+
 end         % if ~click_to_point
 
