@@ -94,8 +94,7 @@ img_name        = '32_image_';
 img_raw_color   = imread([ img_name 'raw.color.png' ]);
 img_raw_depth   = imread([ img_name 'raw.depth.png' ]);
 img_proc_pick   = imread([ img_name 'proc.pickpoint.png' ]);
-depth_scale     = 1/10^4;
-inputDepth      = double(img_raw_depth)*depth_scale;
+
 
 cameraIntrinsics    = load('test-camera-intrinsics.txt','ascii');
 cameraPose          = load('test-camera-pose.txt','ascii');
@@ -111,6 +110,13 @@ disp([ 'Size of img_raw_color = ' num2str(size(img_raw_color)) ]);
 disp([ 'Size of img_raw_depth = ' num2str(size(img_raw_depth)) ]);
 
 %----------------------------------------------------------------------
+%   Convert depth image
+
+depth_scale     = 1/10^4;
+inputDepth      = double(img_raw_depth)*depth_scale;
+
+%----------------------------------------------------------------------
+%  Plot the loaded image data
 
 
 N_metrics           = 2;    % number of metrics to record for each pick point
