@@ -1,5 +1,5 @@
 %
-%   test12.m
+%   test13.m
 %
 %   Testing of Suction 1.0
 %   Martin Krucinski
@@ -11,6 +11,8 @@
 %   2019-01-25      v11 Include frequency / slope effect of the tangential
 %                       direction of the suction cup lip
 %   2019-01-28      v12 Add click-pick-point to analyze feature
+%   2019-02-05      v13 Moved initialization of suction to init_Suction
+%                       script
 
 
 %   Define running mode
@@ -33,8 +35,7 @@ NskipY          = 5%200%10;
 in      = 0.0254;
 mm      = 1e-3;
 
-Suction.RO      = 47/2*mm;  %20*mm %*****47/2*mm;        %   Suction cup OUTER radius
-Suction.RI      = 35/2*mm;  %15*mm %***35/2*mm;        %   Suction cup INNER radius, lip width approx. 5 mm
+init_Suction
 
 %----------------------------------------------------------------------
 %   Define bin parameters
@@ -112,7 +113,6 @@ if 0,
     disp([ 'Size of img_raw_depth = ' num2str(size(img_raw_depth)) ]);
     
 end
-
 %----------------------------------------------------------------------
 %   Convert depth image
 
@@ -338,10 +338,7 @@ for pick_point_no = 1:N_pick,
     [COx, COy]  = circle(Suction.RO);
     
     %   Centerline circle is CM
-    
-    Suction.RM      = mean([ Suction.RI Suction.RO]);    % mean suction cup lib radius
-    Suction.Rcheck  = (Suction.RO - Suction.RI)/2;      % radius distance to check around for lip points, half of the suction lip width
-    
+
     %***    Lip_Complete_Flag = true;
     Lip_Complete_Flag = Lip_Complete_Check( lipX, lipY, lipZ, Suction);
     
