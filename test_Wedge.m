@@ -17,7 +17,7 @@ R       = 0.030;        % Radius
 N       = 50;         % number of points along x & y directions
 
 h       = 0.050;        % cylinder base height
-A       = 0.050%0.010;        % ramp height
+A       = 0.001%0.010;        % ramp height
 
 
 init_Suction

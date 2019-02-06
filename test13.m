@@ -20,7 +20,7 @@
 script_flag = 1;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
 % 0 - DO plot individual point cloud plots
 
-plot_PC_overlay = 0;    % 1 - DO plot point cloud with suction cup lip points overlaid
+plot_PC_overlay = 1;    % 1 - DO plot point cloud with suction cup lip points overlaid
 % 0 - DO NOT plot the enhanced point cloud
 
 click_to_point = 1;     % 1 - click in image to analyze pick-point
@@ -88,9 +88,9 @@ Std_Bad      = 0.150; %***0.030;           % standard deviation for pick points 
 %   Load sensor data images for testing
 %
 
-%***img_name        = '24_image_';
+img_name        = '24_image_';
 %***img_name        = '36_image_';
-img_name        = '32_image_';
+%***img_name        = '32_image_';
 
 img_raw_color   = imread([ img_name 'raw.color.png' ]);
 img_raw_depth   = imread([ img_name 'raw.depth.png' ]);

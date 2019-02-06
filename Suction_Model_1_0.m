@@ -15,10 +15,20 @@ N_segments      = 100;
 dtheta          = 2*pi/100;
 
 deg             = pi/180;
-max_slope       = 100e-3/(45*deg); %***10e-3/(45*deg);       % max slope is 10 mm per 45 degree, *** NEEDS CALIBRATION ***
-slope_factor    = 1;                    % tuning factor as to how fast the score changes from 1 to 0 in the transition
+%-------------------------------------------------------------------------
+%
+%   Max slope parameter
+%
+%
+%max_slope       = 100e-3/(45*deg); %***10e-3/(45*deg);       % max slope is 10 mm per 45 degree, *** NEEDS CALIBRATION ***
+max_slope_linear = 0.55;        % from calibration experiments on 02/01/2019, max linear slope
+
+
+slope_factor    = 0.2;%***1;                    % tuning factor as to how fast the score changes from 1 to 0 in the transition
+
 % region from low slope (dlipZ) to
 % high slope
+% higher value means quicke drop-off to score 0
 
 if 0,
     % **** ACTUALLY SKIP RECTANGULAR SEGMENTS IMPLEMENTATION, USE ANGLES
@@ -86,12 +96,12 @@ lipZ_avg_tangential(N_segments)  = lipZ_avg_tangential(N_segments-1);
 lipZ_std_tangential(N_segments)  = lipZ_std_tangential(N_segments-1);
 
 %   differentiate along the tangential direction
-dlipZ_avg_tangential             = [ diff(lipZ_avg_tangential)/dtheta ; 0];
+dlipZ_avg_tangential             = [ diff(lipZ_avg_tangential) / ( dtheta * Suction.RM ) ; 0];  % LINEAR slope
 
 %   find max slope
-max_dlipZ           = max(dlipZ_avg_tangential);
+max_dlipZ           = max(abs(dlipZ_avg_tangential));   % need the max ABS slope, both negative and positive
 
-Score               = 1 - ( atan( max_dlipZ / max_slope * slope_factor ) / (pi/2) );
+Score               = 1 - ( atan( max_dlipZ / max_slope_linear * slope_factor ) / (pi/2) );
 
 %--------------------------------------------------------------------------
 
