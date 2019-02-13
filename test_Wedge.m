@@ -10,19 +10,22 @@
 in      = 0.0254;
 mm      = 1e-3;
 
-version = 1;            % 1 - one single step
+version = 3            % 1 - one single step
 % 2 - two steps
+% 3 - ramp
 
 R       = 0.030;        % Radius
 N       = 50;         % number of points along x & y directions
 
 h       = 0.050;        % cylinder base height
-A       = 0.001%0.010;        % ramp height
+A       = 0.0125%0.010;        % ramp height
 
 
 init_Suction
 
-[worldX, worldY, worldZ] = Wedge(R, A, N, version);
+slope   = Suction.max_slope_linear / (1/2);
+
+[worldX, worldY, worldZ] = Wedge(R, A, N, slope, version);
 
 %----------------------------------------------------------------------
 %   Plot 3D point cloud

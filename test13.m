@@ -17,14 +17,23 @@
 
 %   Define running mode
 
-script_flag = 0;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
-% 0 - DO plot individual point cloud plots
+interactive = 1;
 
-plot_PC_overlay = 1;    % 1 - DO plot point cloud with suction cup lip points overlaid
-% 0 - DO NOT plot the enhanced point cloud
+if interactive,
+    script_flag = 0;
+    plot_PC_overlay = 1;
+    click_to_point = 1;
+else
+    script_flag = 1;        % 1 - running as multiple pick points evaluation script, DO NOT plot individual point cloud plots
+    % 0 - DO plot individual point cloud plots
+    
+    plot_PC_overlay = 0;    % 1 - DO plot point cloud with suction cup lip points overlaid
+    % 0 - DO NOT plot the enhanced point cloud
+    
+    click_to_point = 0;     % 1 - click in image to analyze pick-point
+    % 0 - run normal, scripted pick-point selection
+end
 
-click_to_point = 1;     % 1 - click in image to analyze pick-point
-% 0 - run normal, scripted pick-point selection
 
 NskipX          = 5%200%10;   % pixel spacing between pick points to evaluate
 NskipY          = 5%200%10;
@@ -88,9 +97,9 @@ Std_Bad      = 0.150; %***0.030;           % standard deviation for pick points 
 %   Load sensor data images for testing
 %
 
-img_name        = '24_image_';
+%***img_name        = '24_image_';
 %***img_name        = '36_image_';
-%***img_name        = '32_image_';
+img_name        = '32_image_';
 
 img_raw_color   = imread([ img_name 'raw.color.png' ]);
 img_raw_depth   = imread([ img_name 'raw.depth.png' ]);
@@ -717,11 +726,37 @@ if ~click_to_point,
     set(h_f15_imraw,'AlphaData', 0.5);
     set(h_f15_im1,'AlphaData', 0.5);
     
-    Ntop    = 20;
-
     colormap(map2)
     title(['Suction 1.0 Heat Map LINEAR ramp color map with Ntop = ' num2str(Ntop) ])
     
+     %----------------------------------------------------------------------
+    %   Plot SMOOTHED heat map overlaid on original RGB image with linear ramp heat map
+    %
+    
+    f16 = figure;
+    
+    Nsmooth     = 5;
+    t1=NskipX^(1/Nsmooth);
+    
+    imgA        = Image_M2_Large;
+    imgB        = imgA;
+    for s=1:Nsmooth,
+        imgB=imresize(imgB,t1,'bilinear');
+    end
+    Image_M2_Large_smooth  = imgB;
+    
+    h_f16_imraw     = image(img_raw_color);
+    hold on
+    h_f16_im1       = image(Image_M2_Large_smooth);
+    
+    set(h_f16_imraw,'AlphaData', 0.5);
+    set(h_f16_im1,'AlphaData', 0.5);
+    
+    
+    colormap(map2)
+    title(['SMOOTHED Suction 1.0 Heat Map LINEAR ramp color map' ])
+    
+   
 
 end         % if ~click_to_point
 

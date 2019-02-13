@@ -11,18 +11,40 @@ function Score = Suction_Model_1_0( lipX, lipY, lipZ, Suction)
 
 debug = 0;
 
+%*** seems I was getting NaNs in the 
+% lipZ_avg_tangential
+% 
+% lipZ_avg_tangential =
+% 
+%        NaN
+%    -0.0080
+%        NaN
+%    -0.0124
+%    -0.0062
+%    -0.0114
+%    -0.0061
+% 
+% Which leads to 
+% std_lipZ =
+% 
+%    NaN
+%
+%   *** SOLUTION is to either
+%   1) decrease N_segments so that there are always lipZ points in that
+%   angle segment
+%
+%   OR
+%
+%   try to put std = 99, avg = 0 in segments with zero points,
+%   replaced the 99 later with the median of the lipZ tangential
+   
 N_segments      = 100;
+%***N_segments      = 18;
+
+
 dtheta          = 2*pi/100;
 
 deg             = pi/180;
-%-------------------------------------------------------------------------
-%
-%   Max slope parameter
-%
-%
-%max_slope       = 100e-3/(45*deg); %***10e-3/(45*deg);       % max slope is 10 mm per 45 degree, *** NEEDS CALIBRATION ***
-max_slope_linear = 0.55;        % from calibration experiments on 02/01/2019, max linear slope
-
 
 slope_factor    = 0.2;%***1;                    % tuning factor as to how fast the score changes from 1 to 0 in the transition
 
@@ -77,18 +99,34 @@ for i=1:(N_segments-1),
     
     lipZ_segment    = lipZ( linear_indices );
     
-    lipZ_avg_tangential(i)  = mean(lipZ_segment);
-    lipZ_std_tangential(i)  = std(lipZ_segment);
+    if length(lipZ_segment)>0,
+        lipZ_avg_tangential(i)  = mean(lipZ_segment);
+        lipZ_std_tangential(i)  = std(lipZ_segment);
+    else
+        lipZ_avg_tangential(i)  = 0;
+        lipZ_std_tangential(i)  = 99;
+    end
+    
     
     
 end
+
+i_99                        = find(lipZ_std_tangential == 99);
+std_median                  = median(lipZ_std_tangential);
+lipZ_std_tangential(i_99)   = std_median * ones(size(i_99));
+
+
 
 %   replicate value at index  (N_segments - 1) for the last value at
 %   (N_segments)
 %    **** ACTUALLY THIS IS WRONG!
 %    **** REPLICATE THE 1st value instead so that we can detect a sharp
 %    step right at the end!
-
+%
+%   2019-02-12  Do note that missing a step RIGHT AT THE END is UNLIKELY
+%               and the above feature would make testing more difficult
+%               with ramps in the middle of the profile but a step at the
+%               end
 
 %   ***** IN PROGRESS *****
 
@@ -101,7 +139,33 @@ dlipZ_avg_tangential             = [ diff(lipZ_avg_tangential) / ( dtheta * Suct
 %   find max slope
 max_dlipZ           = max(abs(dlipZ_avg_tangential));   % need the max ABS slope, both negative and positive
 
-Score               = 1 - ( atan( max_dlipZ / max_slope_linear * slope_factor ) / (pi/2) );
+%***Score               = 1 - ( atan( max_dlipZ / max_slope_linear * slope_factor ) / (pi/2) );
+%
+%   2019-02-12  Introduce non-linear deadband, allow slopes <
+%   max_slop_linear to receive a score of 100%
+%
+%   later, introduce the LP filtered version...
+%
+Score_freq              = 1 - ( atan( max( 0, max_dlipZ - Suction.max_slope_linear ) / Suction.max_slope_linear * slope_factor ) / (pi/2) );
+
+%  2019-02-12   Include amplitude effect
+
+std_lipZ                = std(lipZ_avg_tangential);     % overall standard deviation along tangential direction
+%       Include a factor of 3 to account for better scores for larger
+%       apmlitude steps with low frequency content
+Score_amp               = max( 0, 1 - (std_lipZ / (3 * Suction.max_lipZ_amplitude) ) );
+
+%   2019-02-12  Calculate combined score
+Score                   = Score_amp * Score_freq;
+
+%   print for debug purposes
+if debug,
+    
+    Score_freq
+    Score_amp
+    Score
+    
+end
 
 %--------------------------------------------------------------------------
 
