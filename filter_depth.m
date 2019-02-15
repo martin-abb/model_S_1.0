@@ -7,5 +7,5 @@ filteredDepth           = inputDepth;
 filteredDepth(izeros)   = d_move_back*ones(size(izeros));
 filteredDepth           = reshape(filteredDepth, size(inputDepth));
 
-disp('FILTERING Depth Map!!!')
+%***disp('FILTERING Depth Map!!!')
 
