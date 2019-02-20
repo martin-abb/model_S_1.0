@@ -1,0 +1,49 @@
+cycle_header: 
+  job: "empty_mtote_2018-12-05-16-15"
+  seqno: 36
+  pick_tote_loc: 1
+  pick_compartment_loc: 0
+  place_tote_loc: 11
+  gripper: ''
+  gripper_no: 0
+  item_sku: ''
+  ts_initiate: 
+    secs: 1544044785
+    nsecs: 213931742
+  ts_pickpoint: 
+    secs: 1544044786
+    nsecs:  40951187
+  ts_placepoint: 
+    secs: 0
+    nsecs:         0
+  ts_pickplan: 
+    secs: 1544044786
+    nsecs:  42721304
+  ts_placeplan: 
+    secs: 1544044786
+    nsecs:  42721438
+  ts_orderrun: 
+    secs: 1544044786
+    nsecs:  47891773
+  ts_startrun: 
+    secs: 1544044786
+    nsecs: 132664704
+  ts_endrun: 
+    secs: 1544044789
+    nsecs:  23054946
+  result: 0
+  mts: 1758.80908203
+success: True
+errCode: 0
+tsPickStarted: 0.953423023224
+tsPicked: 104.733001709
+tsPickExited: 0.0
+tsLost: 0.0
+tsPlaceStarted: 0.0
+tsPlaced: 2.73373007774
+tsPlaceExited: 2.73373007774
+tsEnd: 0.0
+flagPickSearch: 0
+posPicked: -18.3125
+pickRetryCount: 0
+posPlaced: 150.0

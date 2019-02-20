@@ -25,7 +25,8 @@ plot_PC_overlay = 1;
 
 %----------------------------------------------------------------------
 %   For comparison script
-data_dir_local  = 'C:\Users\USMAKRU\Documents\ABB Local\Logistics_Project\operation_data\empty_mtote_2019-01-28-16-09';
+%data_dir_local  = 'C:\Users\USMAKRU\Documents\ABB Local\Logistics_Project\operation_data\empty_mtote_2019-01-28-16-09';
+data_dir_local  = 'C:\Users\USMAKRU\Documents\ABB Local\Logistics_Project\operation_data\empty_mtote_2019-02-13-09-59';
 
 base_dir_local  = 'C:\Users\USMAKRU\OneDrive - ABB\2018\Logistics\Suction Cup Modeling\Suction_1.0_ML\data';
 
@@ -64,8 +65,28 @@ depth_scale     = 1/10^4;
 
 N_metrics           = 2;    % number of metrics to record for each pick point
 
+%----------------------------------------------------------------------
+%   Prepare a directory where to save images & log file
+%----------------------------------------------------------------------
+
+base_dir        = pwd;
+
+log_dir         = [ data_dir '\matlab_results' ];
+mkdir( data_dir, 'matlab_results' );
+
+cd(log_dir);
+
+diary('Comparison.txt');
+
+%----------------------------------------------------------------------
+%   main images loop
+%----------------------------------------------------------------------
+
 %for img_no = 1:2,
-for img_no = 12%1:num_images,
+%for img_no = 12%1:num_images,
+%for img_no = 1:num_images,
+img_skip    = 8;
+for img_no = 1:img_skip:num_images,
     
     %   import the pick points in image pixel coordinates
     img_no_text     = num2str(img_no - 1);
@@ -427,6 +448,11 @@ for img_no = 12%1:num_images,
         PickMetrics(pick_point_no, 2)       = Score;
         
         
+        % for DEBUG purposes
+        if pick_point_no==8,
+            2+3;
+        end
+        
         %----------------------------------------------------------------------
         %   Plot world 3D point cloud with pick point suction cup lips point clouds highlighted
         %
@@ -589,7 +615,13 @@ for img_no = 12%1:num_images,
     end
     
     
+%***    saveas(f4, [ logdir '\' img_name 'compare.png']);
+    saveas(f4, [ img_name 'compare.png']);
     
     
     
 end         % for img_no = 1:num_images,
+
+diary off
+
+cd(base_dir)

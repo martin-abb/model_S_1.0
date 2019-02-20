@@ -1,0 +1,8 @@
+# point_name, point_x, point_y, point_z, reachable, inbound, collision, cf1, cf4, cf6, cfx, gripper_x, gripper_y, gripper_z 
+pick, 45.628, 66.764, 95.141, 1, 1, 0, 0, 0, 0
+pick_appr, 45.628, 66.764, 95.141, 1, 1, 0, 0, 0, 0
+pick_above, 45.628, 66.764, 330.141, 1, 1, 0, 0, 0, 0
+place, 71.5024, 108.411, 95.141, 1, 1, 0, 0, 0, 0
+place_appr, 71.5024, 108.411, 195.141, 1, 1, 0, 0, 0, 0
+place_above, 71.5024, 108.411, 330.141, 1, 1, 0, 0, 0, 0
+# Skill pickpoint 0 placepoint 0: 0

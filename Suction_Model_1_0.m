@@ -115,7 +115,11 @@ i_99                        = find(lipZ_std_tangential == 99);
 std_median                  = median(lipZ_std_tangential);
 lipZ_std_tangential(i_99)   = std_median * ones(size(i_99));
 
+%*** 2019-02-18 Added modification of lipZ_avg_tangential as well to AVOID
+% SPIKES in the lipZ height and slope which can LOWER the Score_freq metric
 
+avg_median                  = median(lipZ_avg_tangential);
+lipZ_avg_tangential(i_99)   = avg_median * ones(size(i_99));
 
 %   replicate value at index  (N_segments - 1) for the last value at
 %   (N_segments)
