@@ -64,6 +64,8 @@ Std_Bad      = 0.150; %***0.030;           % standard deviation for pick points 
 
 dirmask     = '*.tote.txt';
 data_dir    = data_dir_local;
+data_dir_parts  = regexp(data_dir, '\','split');
+last_dir    = data_dir_parts{end};
 
 dir_content     = dir( [ data_dir '\' dirmask ] );
 num_images      = length(dir_content);
@@ -86,7 +88,13 @@ mkdir( data_dir, 'matlab_results' );
 
 cd(log_dir);
 
-diary('Comparison.txt');
+diary_name      = [ 'Comparison_' last_dir '.txt' ];
+delete(diary_name);
+diary( diary_name );
+disp([ 'Processing files in directory:  ' last_dir ])
+disp(data_dir)
+disp(' ')
+
 
 %----------------------------------------------------------------------
 %   main images loop
@@ -184,10 +192,15 @@ for img_no = 1:img_skip:num_images,
     r1=rectangle('Position',[0,0,648,30]);
     set(r1,'FaceColor','w')
     
-    data_dir_text   = mk_str(data_dir);
+    if 0, % the first version gives text interpreter error
+        data_dir_text   = mk_str(data_dir);
+        f4t = text(10, 10, data_dir_text);
+    else
+        % f4t = text(10, 10, data_dir, 'interpreter','none');
+        f4t = text(10, 10, last_dir, 'interpreter','none');
+    end
     
-    f4t = text(10, 10, data_dir_text);
-    set(f4t,'FontSize',6);
+    set(f4t,'FontSize',10);
     set(f4t,'FontWeight','Bold');
     set(f4t,'Color','k');
     
@@ -506,11 +519,12 @@ for img_no = 1:img_skip:num_images,
     %   Combine MIT & ABB metrics
     
     Scores_ABB      = PickMetrics(:,2);
-    All_Metrics     = [ Scores_MIT  PickMetrics ];
+    All_Metrics     = [ Scores_MIT  PickMetrics(:,2:4) ];
     All_Metrics_Percent     = [ (1:N_pick)'   round(All_Metrics*100) ];
     
     disp('Metrics: MIT and ABB Suction 1.0')
-    All_Metrics_Percent
+    disp('     #   MIT Score  Freq   Amp')
+    disp(All_Metrics_Percent)
     
     %   Re-sort metrics based on ABB score
     
@@ -518,7 +532,8 @@ for img_no = 1:img_skip:num_images,
     
     All_Metrics_Percent_ABB_sorted = All_Metrics_Percent(i_sort_ABB, :);
     disp('Metrics: MIT and ABB Suction 1.0 sorted by ABB score')
-    All_Metrics_Percent_ABB_sorted
+    disp('     #   MIT Score  Freq   Amp')
+    disp(All_Metrics_Percent_ABB_sorted)
     
     
     
@@ -567,7 +582,7 @@ for img_no = 1:img_skip:num_images,
             
             Pick_no_string  = num2str( All_Metrics_Percent( pick_point_no, 1 ) );
             MIT_string      = num2str( All_Metrics_Percent( pick_point_no, 2 ) );
-            Score_string    = num2str( All_Metrics_Percent( pick_point_no, 4:6 ) ); % Note! ABB has std(lipZ), Score, Score_amp, Score_freq
+            Score_string    = num2str( All_Metrics_Percent( pick_point_no, 3:5 ) ); % Note! ABB has ** REMOVED std(lipZ) ***, Score, Score_amp, Score_freq
             
             text_x_offset   = Suction.RO * 0.4;
             text_y_offset   = Suction.RO * 0.3;
@@ -623,7 +638,7 @@ for img_no = 1:img_skip:num_images,
         
         Pick_no_string  = num2str( All_Metrics_Percent( pick_point_no, 1 ) );
         MIT_string      = num2str( All_Metrics_Percent( pick_point_no, 2 ) );
-        ABB_string    = num2str( All_Metrics_Percent( pick_point_no, 4:6 ) ); 
+        ABB_string    = num2str( All_Metrics_Percent( pick_point_no, 3:5 ) ); 
         % Note! ABB has Score_metric            = [ Score Score_freq Score_amp ]; 
         
         
