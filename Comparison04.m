@@ -34,10 +34,13 @@ plot_PC_overlay = 1;
 %   PICKPOINTS to plot detailed point cloud plots for deeper assesment
 %   purposes
 %
-% all_plot_select_flag = { ...
-%     uint16([1 8 5 11 3])  ; % img 0
-%     };
-all_plot_select_flag = { };
+if 1%0,
+    all_plot_select_flag = { ...
+        uint16([1 8 5 11 3])  ; % img 0
+        };
+else
+    all_plot_select_flag = { };
+end
 
 
 %   Set up looping over directories
@@ -50,9 +53,9 @@ num_dir_top     = length(dir_content_top);
 base_dir_local  = 'C:\Users\USMAKRU\OneDrive - ABB\2018\Logistics\Suction Cup Modeling\Suction_1.0_ML\data';
 
 %***for dir_no = 1:num_dir_top,
-for dir_no = 201:203, %*** use 3 directories for testing, full number is 247
+for dir_no = 1%201:203, %*** use 3 directories for testing, full number is 247
     
-    if 0,
+    if 1%0,
         %----------------------------------------------------------------------
         %   For comparison script
         %data_dir_local  = 'C:\Users\USMAKRU\Documents\ABB Local\Logistics_Project\operation_data\empty_mtote_2019-01-28-16-09';
@@ -131,7 +134,7 @@ for dir_no = 201:203, %*** use 3 directories for testing, full number is 247
         %for img_no = 1:2,
         %for img_no = 12%1:num_images,
         %for img_no = 1:num_images,
-        img_skip    = 1;        %8;
+        img_skip    = 8%1;        %8;
         
         for img_no = 1:img_skip:num_images,
             
@@ -684,7 +687,7 @@ for dir_no = 201:203, %*** use 3 directories for testing, full number is 247
                     pixel_file_contents(pick_point_no,2) - text_y_offset, ...
                     [  MIT_string ' : ' ABB_string ] );
                 
-                set(t92,'FontSize',12);
+                set(t92,'FontSize',10);
                 set(t92,'FontWeight','Bold');
                 set(t92,'Color',score_color);
             end

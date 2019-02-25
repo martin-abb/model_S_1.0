@@ -141,7 +141,21 @@ lipZ_std_tangential(N_segments)  = lipZ_std_tangential(N_segments-1);
 dlipZ_avg_tangential             = [ diff(lipZ_avg_tangential) / ( dtheta * Suction.RM ) ; 0];  % LINEAR slope
 
 %   find max slope
-max_dlipZ           = max(abs(dlipZ_avg_tangential));   % need the max ABS slope, both negative and positive
+
+%***max_dlipZ           = max(abs(dlipZ_avg_tangential));   % need the max ABS slope, both negative and positive
+% MK 2019-02-25 Replace with ALTERNATE metric that properly detects slope
+% both BEFORE and AFTER an edge
+% Per my 2019-02-25 note:
+% Another option to handle this is:
+% 	To handle the edge of box case better,
+% 	instead of using max(dlipZ) as the max slope,
+% 	use max( (dlipZ – min(dlipZ)),
+% i.e. find the MAX difference in slope values…
+
+min_dlipZ           = min(dlipZ_avg_tangential);
+max_dlipZ           = max( dlipZ_avg_tangential - min_dlipZ );  % need the max slope,
+                                                                % accounting for both NEG and POS slopes surrounding an edge
+
 
 %***Score               = 1 - ( atan( max_dlipZ / max_slope_linear * slope_factor ) / (pi/2) );
 %
