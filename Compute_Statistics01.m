@@ -9,11 +9,23 @@
 %   Use NA_number as the Not Applicable number for proper column spacing in
 %   tables
 
-NA_number       = -9999;
+NA_number               = -9999;
 
-all_MIT_scores_failed  = [];
-all_ABB_scores_failed  = [];
+all_MIT_scores_failed   = [];
+all_ABB_scores_failed   = [];
 
+all_MIT_scores_success  = [];
+all_ABB_scores_success  = [];
+
+all_MIT_scores          = [];
+all_ABB_scores          = [];
+
+all_success             = [];
+
+all_Error_Codes         = [];
+
+all_labels              = {};
+l                       = 1;    % label index
 
 %   Set up looping over directories
 
@@ -29,9 +41,9 @@ base_dir_local  = 'C:\Users\USMAKRU\OneDrive - ABB\2018\Logistics\Suction Cup Mo
 
 %disp('*** SPECIAL PROCESSING *** Starting at directory 222 and going downwards...')
 for dir_no = 222:(-1):4,  % traverse directories from newest to oldest
-
-%for dir_no = 1:num_dir_top,
-%***for dir_no = 201:220, %*** use 3 directories for testing, full number is 247
+    
+    %for dir_no = 1:num_dir_top,
+    %***for dir_no = 201:220, %*** use 3 directories for testing, full number is 247
     
     if 0,
         %----------------------------------------------------------------------
@@ -65,7 +77,11 @@ for dir_no = 222:(-1):4,  % traverse directories from newest to oldest
     
     log_dir         = [ data_dir '\matlab_results' ];
     
+    %all_dir_labels  = {};
+    
     if exist(log_dir)==7,   %   Make sure matlab_results directory exists
+                            %   some directories were EMPTY and no
+                            %   \matlab_results sub-directory was created
         
         cd(log_dir);
         
@@ -80,6 +96,19 @@ for dir_no = 222:(-1):4,  % traverse directories from newest to oldest
         %   Chosen Pick Point #
         
         Summary_table = import_summary(summary_name);
+        
+        %   Filter out last row (OR SEVERAL ROWS) if all zeros
+        
+        end_element     = Summary_table(end,2);
+        while end_element  == 0,
+            Summary_table   = Summary_table(1:(end-1),:);
+            if length(Summary_table) >1,
+                end_element     = Summary_table(end,2);
+            else
+                end_element = 1;    % Use non-zero number to abort while loop
+            end
+        end
+        
         tot_num_cols    = 7;    % total number of columns in metrics tables
         
         tot_num_summary_cols    = tot_num_cols + 1; % total number of columns in summary tables, ADD the pick point #
@@ -113,27 +142,75 @@ for dir_no = 222:(-1):4,  % traverse directories from newest to oldest
         Error_Codes     = Summary_table(:, col_Error_Code);
         
         ind_Failures    = find( (Error_Codes == -11) | (Error_Codes == -20) );  % -11 failed grasp, -20 item lost in transport
+        ind_Successes   = find( Summary_table(:,col_Success) == 1 );            %
         
-        MIT_scores      = Summary_table( ind_Failures, col_MIT);
-        ABB_scores      = Summary_table( ind_Failures, col_ABB);
+        MIT_scores_failed      = Summary_table( ind_Failures, col_MIT);
+        ABB_scores_failed      = Summary_table( ind_Failures, col_ABB);
+        
+        MIT_scores_success     = Summary_table( ind_Successes, col_MIT);
+        ABB_scores_success     = Summary_table( ind_Successes, col_ABB);
+        
+        MIT_scores      = Summary_table( :, col_MIT);
+        ABB_scores      = Summary_table( :, col_ABB);
+        
+        success         = Summary_table( :, col_Success);
+        
+        
+        %   Create pick step labels
+        %   Note that pick steps use 0 - based indexing
+        
+        % THIS DOESN'T WORK, TOO MANY lables    N_picks         = length(Summary_table);    % number of picks in this run
+        N_picks     = length(MIT_scores);
+        
+        
+        % picks_range         = (1:N_picks)';
+        
+        for i=1:N_picks,
+            if ismember(i, ind_Failures),
+                err_string = 'F ';
+            else
+                err_string = '  ';
+            end
+            
+            N_picks_string_0    = num2str( rem( i-1 , 10) );
+            N_picks_string_00   = num2str( floor( rem( i-1 , 100) / 10) );
+            PickPoint_no        = Summary_table(i, col_PickPoint_no);
+            label_i             = [ err_string last_dir '-' N_picks_string_00 N_picks_string_0 '-' num2str(PickPoint_no) ];
+            
+            all_labels{l}     = label_i;
+            l                   = l+1;
+        end
         
         %   prepare for processing of next folder
         cd(base_dir)
         
         close all
         
+        
+        
+        
+        %   Store results
+        
+        all_MIT_scores_failed      = [ all_MIT_scores_failed ; MIT_scores_failed ];
+        all_ABB_scores_failed      = [ all_ABB_scores_failed ; ABB_scores_failed ];
+        
+        all_MIT_scores_success      = [ all_MIT_scores_success ; MIT_scores_success ];
+        all_ABB_scores_success      = [ all_ABB_scores_success ; ABB_scores_success ];
+        
+        all_MIT_scores              = [ all_MIT_scores ; MIT_scores ];
+        all_ABB_scores              = [ all_ABB_scores ; ABB_scores ];
+        
+        all_Error_Codes             = [ all_Error_Codes ; Error_Codes ];
+        all_success                 = [ all_success ; success ];
+        
     end %     if exist(log_dir)==2,   %   Make sure matlab_results directory exists
-    
-    %   Store results
-    all_MIT_scores_failed      = [ all_MIT_scores_failed ; MIT_scores ];
-    all_ABB_scores_failed      = [ all_ABB_scores_failed ; ABB_scores ];
-    
-    
     
     
 end % for dir_no = 1:num_dir_top,
 
+%----------------------------------------------------------------------
 %   Plot MIT & ABB Score overview for failed picks
+%----------------------------------------------------------------------
 
 f1  = figure;
 
@@ -148,6 +225,61 @@ ylabel('Pick Score [%]')
 xlabel('Failed pick #')
 title('Pick Score for failed picks')
 grid on
+
+
+%----------------------------------------------------------------------
+%   Plot MIT & ABB Score overview for successful picks
+%----------------------------------------------------------------------
+
+f2  = figure;
+
+set(f2, 'DefaultLineLineWidth', 3);
+
+plot(all_MIT_scores_success, 'bo');
+hold on
+plot(all_ABB_scores_success, 'ro');
+legend('MIT','ABB')
+ylim([0 100])
+ylabel('Pick Score [%]')
+xlabel('Successful pick #')
+title('Pick Score for successful picks')
+grid on
+
+%----------------------------------------------------------------------
+%   Plot MIT & ABB Score overview for ALL picks
+%----------------------------------------------------------------------
+
+f3  = figure;
+
+set(f3, 'DefaultLineLineWidth', 3);
+
+plot(all_MIT_scores, 'bo');
+hold on
+plot(all_ABB_scores, 'ro');
+legend('MIT','ABB')
+ylim([0 100])
+ylabel('Pick Score [%]')
+xlabel('Pick #')
+title('Pick Score for ALL picks')
+grid on
+
+%   Add labels
+
+for i=1:length(all_labels),
+ti=text(i, -10, mk_str(all_labels{i}));
+set(ti,'Rotation',-90);
+end
+ylim([-100 100])
+
+%----------------------------------------------------------------------
+%   Display summary statistics
+%----------------------------------------------------------------------
+
+M_ABB   = [all_ABB_scores  all_success ];
+C_ABB   = corrcoef( M_ABB )
+
+M_MIT   = [all_MIT_scores  all_success ];
+C_MIT   = corrcoef( M_MIT )
 
 %----------------------------------------------------------------------
 %   Return to home directory
