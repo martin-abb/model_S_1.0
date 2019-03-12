@@ -266,8 +266,10 @@ grid on
 %   Add labels
 
 for i=1:length(all_labels),
-ti=text(i, -10, mk_str(all_labels{i}));
-set(ti,'Rotation',-90);
+    ti=text(i, -10, mk_str(all_labels{i}));
+    set(ti,'Rotation',-90);
+    set(ti,'FontName','Courier New');
+    set(ti,'FontWeight','bold');
 end
 ylim([-100 100])
 
@@ -280,6 +282,60 @@ C_ABB   = corrcoef( M_ABB )
 
 M_MIT   = [all_MIT_scores  all_success ];
 C_MIT   = corrcoef( M_MIT )
+
+
+%----------------------------------------------------------------------
+%   Plot MIT & ABB Score histograms
+%----------------------------------------------------------------------
+
+f4  = figure;
+
+%set(f4, 'DefaultLineLineWidth', 3);
+
+hist_range  = [0:1:100];
+
+h4ABBs = histogram(all_ABB_scores_success, hist_range);
+set(h4ABBs, 'FaceColor','b');
+hold on
+h4ABBf = histogram(all_ABB_scores_failed, hist_range);
+set(h4ABBf, 'FaceColor','r');
+xlabel('Pick Score [%]')
+title('ABB Scores: BLUE - Success, RED - Failed')
+
+%----------------------------------------------------------------------
+f5  = figure;
+
+h5MITs = histogram(all_MIT_scores_success, hist_range);
+set(h5MITs, 'FaceColor','b');
+hold on
+h5MITf = histogram(all_MIT_scores_failed, hist_range);
+set(h5MITf, 'FaceColor','r');
+xlabel('Pick Score [%]')
+title('MIT Scores: BLUE - Success, RED - Failed')
+
+%----------------------------------------------------------------------
+f6  = figure;
+
+h6ABBs = histogram(all_ABB_scores_success, hist_range);
+set(h6ABBs, 'FaceColor','r');
+hold on
+h6MITs = histogram(all_MIT_scores_success, hist_range);
+set(h6MITs, 'FaceColor','b');
+xlabel('Pick Score [%]')
+title('SUCCESS Scores: RED - ABB, BLUE - MIT')
+
+%----------------------------------------------------------------------
+f7  = figure;
+
+h7ABBf= histogram(all_ABB_scores_failed, hist_range);
+set(h7ABBf, 'FaceColor','r');
+hold on
+h7MITf = histogram(all_MIT_scores_failed, hist_range);
+set(h7MITf, 'FaceColor','b');
+xlabel('Pick Score [%]')
+title('FAILED Scores: RED - ABB, BLUE - MIT')
+
+
 
 %----------------------------------------------------------------------
 %   Return to home directory
