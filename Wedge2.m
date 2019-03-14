@@ -30,6 +30,7 @@ z(i1)   = zeros(size(i1));
 wedge.X     = x;
 wedge.Y     = y;
 wedge.Z     = z;
+wedge.dx    = dx;
 
 end
 
