@@ -1,11 +1,13 @@
 %
-%   test_Objects.m
+%   test_Objects02.m
 %
 %   Martin Krucinski
 %
 
 %   2019-03-13 test_Objects.m
 %   2019-03-14 Improving addObject to use linear distances
+%   2019-03-15 test_Objects02.m - adding more objects, switch bin origin to
+%               (0,0)
 %
 %   Previous version 2019-02-05 test_Wedge.m
 %
@@ -92,58 +94,60 @@ switch world_ver,
         %----------------------------------------------------------------------
         %      World 001
         
-        w1_offset = [ L/2 ; W/2];
-        
-        % dimensions in [m]
-        % Wedge2(        R,         h,      A,      slope_linear,   version,    dx)
-        wedge1  = Wedge2(0.030,     0.050,  A,       slope,         version,    dx);
-        wedge1_insert_pos    = [-L/2 ;-W/2 ] + w1_offset; %[100 ; 200];
-        
-        wedge2  = Wedge2(0.020,     0.040,  0.005,   slope*5,       version,    dx);
-        wedge2_insert_pos    = [-L/2 ; 0 ] + w1_offset;
-        
-        wedge3  = Wedge2(0.010,     0.030,  0.010,   slope/2,       version,    dx);
-        wedge3_insert_pos    = [0 ; -W/2 ] + w1_offset; %[100 ; 200];
-        
-        wedge4  = Wedge2(0.015,     0.020,  0.010,   slope*2,       1,          dx);
-        wedge4_insert_pos    = [0.08 ; 0 ] + w1_offset; %[100 ; 200]
-        
-        wedge5  = Wedge2(0.040,     0.050,  0.020,   slope,         1,          dx);
-        wedge5_insert_pos    = [-0.040 ; -0.040 ] + w1_offset; %[100 ; 200]
-        
-        cylinder1   = Cylinder(0.050, 0.150, dx);
-        cylinder1_insert_pos    =  [0.130 ; 0] + w1_offset;
-        
-        sphere1     = Sphere( 0.050, dx);
-        sphere1_insert_pos     = [0.100 ; -0.150] + w1_offset;
-        
-        box1        = Box(0.100, 0.040, 0.030, dx);
-        box1_insert_pos     = [-0.200 ; -0.150] + w1_offset;
-        
-        world       = addObject( empty , wedge1, wedge1_insert_pos );
-        world       = addObject( world , wedge2, wedge2_insert_pos );
-        world       = addObject( world , wedge3, wedge3_insert_pos );
-        world       = addObject( world , wedge4, wedge4_insert_pos );
-        world       = addObject( world , wedge5, wedge5_insert_pos );
-        world       = addObject( world , cylinder1, cylinder1_insert_pos );
-        world       = addObject( world , sphere1,sphere1_insert_pos );
-        world       = addObject( world , box1,box1_insert_pos );
-        
-        %----------------------------------------------------------------------
-        %   Specify pick points
-        
-        all_PickPoints  = [ 0.000   0.000   0.090   ; ...
-            0.015   -0.100  0.060   ; ...
-            0.100   0.010   0.060   ; ...
-            0.0953    0.0156 0.060   ; ...
-            0.2526    0.0480 0.060   ; ...
-            0.1560   -0.0996 0.060   ; ...
-            0.0117   -0.1899 0.060   ; ...
-            -0.1513   -0.1280 0.060   ; ...
-            -0.2680   -0.1675 0.060   ; ...
-            -0.2806    0.0215 0.060   ; ...
-            0.0138    0.0343 0.060   ; ...
-            ];
+%         w1_offset = [ L/2 ; W/2];
+%         
+%         % dimensions in [m]
+%         % Wedge2(        R,         h,      A,      slope_linear,   version,    dx)
+%         wedge1  = Wedge2(0.030,     0.050,  A,       slope,         version,    dx);
+%         wedge1_insert_pos    = [-L/2 ;-W/2 ] + w1_offset; %[100 ; 200];
+%         
+%         wedge2  = Wedge2(0.020,     0.040,  0.005,   slope*5,       version,    dx);
+%         wedge2_insert_pos    = [-L/2 ; 0 ] + w1_offset;
+%         
+%         wedge3  = Wedge2(0.010,     0.030,  0.010,   slope/2,       version,    dx);
+%         wedge3_insert_pos    = [0 ; -W/2 ] + w1_offset; %[100 ; 200];
+%         
+%         wedge4  = Wedge2(0.015,     0.020,  0.010,   slope*2,       1,          dx);
+%         wedge4_insert_pos    = [0.08 ; 0 ] + w1_offset; %[100 ; 200]
+%         
+%         wedge5  = Wedge2(0.040,     0.050,  0.020,   slope,         1,          dx);
+%         wedge5_insert_pos    = [-0.040 ; -0.040 ] + w1_offset; %[100 ; 200]
+%         
+%         cylinder1   = Cylinder(0.050, 0.150, dx);
+%         cylinder1_insert_pos    =  [0.130 ; 0] + w1_offset;
+%         
+%         sphere1     = Sphere( 0.050, dx);
+%         sphere1_insert_pos     = [0.100 ; -0.150] + w1_offset;
+%         
+%         % juice laying down
+%         box1        = Box(0.105, 0.048, 0.035, dx);
+%         box1_insert_pos     = [-0.200 ; -0.150] + w1_offset;
+%         
+%         
+%         world       = addObject( empty , wedge1, wedge1_insert_pos );
+%         world       = addObject( world , wedge2, wedge2_insert_pos );
+%         world       = addObject( world , wedge3, wedge3_insert_pos );
+%         world       = addObject( world , wedge4, wedge4_insert_pos );
+%         world       = addObject( world , wedge5, wedge5_insert_pos );
+%         world       = addObject( world , cylinder1, cylinder1_insert_pos );
+%         world       = addObject( world , sphere1,sphere1_insert_pos );
+%         world       = addObject( world , box1,box1_insert_pos );
+%         
+%         %----------------------------------------------------------------------
+%         %   Specify pick points
+%         
+%         all_PickPoints  = [ 0.000   0.000   0.090   ; ...
+%             0.015   -0.100  0.060   ; ...
+%             0.100   0.010   0.060   ; ...
+%             0.0953    0.0156 0.060   ; ...
+%             0.2526    0.0480 0.060   ; ...
+%             0.1560   -0.0996 0.060   ; ...
+%             0.0117   -0.1899 0.060   ; ...
+%             -0.1513   -0.1280 0.060   ; ...
+%             -0.2680   -0.1675 0.060   ; ...
+%             -0.2806    0.0215 0.060   ; ...
+%             0.0138    0.0343 0.060   ; ...
+%             ];
         
         all_PickPoints  = [ all_PickPoints(:,1) + w1_offset(1) ...
             all_PickPoints(:,2) + w1_offset(2) ...
@@ -160,44 +164,80 @@ switch world_ver,
         % dimensions in [m]
         % Wedge2(        R,         h,      A,      slope_linear,   version,    dx)
         wedge1  = Wedge2(0.030,     0.050,  A,       slope,         version,    dx);
-        wedge1_insert_pos    = [-L/2 ;-W/2 ;0 ] + w1_offset; %[100 ; 200];
+        wedge1_insert_pos    = [0.000 ; 0.000 ; 0.000];
         
         wedge2  = Wedge2(0.020,     0.040,  0.005,   slope*5,       version,    dx);
-        wedge2_insert_pos    = [-L/2 ; 0 ; 0] + w1_offset;
+        wedge2_insert_pos    = [0.000 ; 0.200 ; 0.000];
         
         wedge5  = Wedge2(0.040,     0.050,  0.020,   slope,         1,          dx);
-        wedge5_insert_pos    = [-0.040 ; -0.040 ;0 ] + w1_offset; %[100 ; 200]
+        wedge5_insert_pos    = [0.300-0.040 ; 0.000; 0.000 ];
         
         cylinder1   = Cylinder(0.050, 0.150, dx);
-        cylinder1_insert_pos    =  [0.130 ; 0 ; 0] + w1_offset;
+        cylinder1_insert_pos    =  [0.430 ; 0.200 ; 0];
         
         sphere1     = Sphere( 0.050, dx);
-        sphere1_insert_pos     = [0.100 ; -0.150 ;0] + w1_offset;
+        sphere1_insert_pos     = [0.400 ; 0.050 ;0];
         
-        box1        = Box(0.100, 0.040, 0.030, dx);
-        box1_insert_pos     = [-0.200 ; -0.150 ; 0] + w1_offset;
+        % juice laying down
+        box1        = Box(0.105, 0.048, 0.035, dx);
+        box1_insert_pos     = [0.100 ; 0.050 ; 0];
+        
+        % juice standing up
+        box2        = Box(0.048, 0.035, 0.105, dx);
+        box2_insert_pos     = [0.100 ; 0.150 ; 0];
+
+        % Olay box
+        box3        = Box(0.100, 0.085, 0.070, dx);
+        box3_insert_pos     = [0.100 ; 0.200 ; 0];
+        
+        % Motrin bottle - laying down
+        
+        cylinder2               = Cylinder(0.055/2, 0.075, dx);
+        cylinder2_insert_pos    =  [0.100 ; 0.300 ; 0.055/2];
+        cylinder2b               = Cylinder(0.040/2, 0.020, dx);
+        cylinder2b_insert_pos    = [0.175 ; 0.300 + (0.055 - 0.040)/2 ; 0.055/2 ];   % specify z-height above floor for insertion
+
+        % Glucosamine bottle - laying down
+        
+        cylinder3               = Cylinder(0.065/2, 0.100, dx);
+        cylinder3_insert_pos    = [0.250 ; 0.150 ; 0.065/2 ];   % specify z-height above floor for insertion
+        cylinder3b               = Cylinder(0.045/2, 0.025, dx);
+        cylinder3b_insert_pos    = [0.250 + 0.100 ; 0.150 + (0.065-0.045)/2 ; 0.065/2 ];   % specify z-height above floor for insertion
+
+        % Pen cylinder - laying down
+        
+        cylinder4   = Cylinder(0.050/2, 0.140, dx);
+        cylinder4_insert_pos    =  [0.250 ; 0.250 ; 0.050/2];
         
         world       = addObject( empty , wedge1, wedge1_insert_pos );
         world       = addObject( world , wedge2, wedge2_insert_pos );
         world       = addObject( world , wedge5, wedge5_insert_pos );
         world       = addObject( world , cylinder1, cylinder1_insert_pos );
-        world       = addObject( world , sphere1,sphere1_insert_pos );
-        world       = addObject( world , box1,box1_insert_pos );
+        world       = addObject( world , sphere1, sphere1_insert_pos );
+        world       = addObject( world , box1, box1_insert_pos );
+        world       = addObject( world , box2, box2_insert_pos );
+        world       = addObject( world , box3, box3_insert_pos );
+        world       = addObject( world , cylinder2, cylinder2_insert_pos );
+        world       = addObject( world , cylinder2b, cylinder2b_insert_pos );
+        world       = addObject( world , cylinder3, cylinder3_insert_pos );
+        world       = addObject( world , cylinder3b, cylinder3b_insert_pos );
+        world       = addObject( world , cylinder4, cylinder4_insert_pos );
         
         %----------------------------------------------------------------------
         %   Specify pick points
         
-        all_PickPoints  = [ [0.000   0.000   0.090] + w1_offset'   ; ...
-            % 0.015   -0.100  0.060   ; ...
-            %0.100   0.010   0.060   ; ...
-            %0.0953    0.0156 0.060   ; ...
-            [ 0.2526    0.0480 0.060] + w1_offset'    ; ...
-            [ 0.1560   -0.0996 0.060] + w1_offset'    ; ...
-            % 0.0117   -0.1899 0.060   ; ...
-            [ -0.1513   -0.1280 0.060] + w1_offset'    ; ...
-            [ -0.2680   -0.1675 0.060] + w1_offset'    ; ...
-            [ -0.2806    0.0215 0.060] + w1_offset'    ; ...
-            %0.0138    0.0343 0.060   ; ...
+        all_PickPoints  = [ ...
+            [0.300  0.040   0.090]    ; ...
+            [0.500  0.250   0.060]    ; ...
+            [0.450  0.100   0.060]    ; ...
+            [0.150  0.075   0.060]    ; ...
+            [0.125  0.165   0.090]    ; ...
+            [0.020  0.220   0.060]    ; ...
+            [0.030  0.030   0.060]    ; ...
+            [0.150  0.250   0.130]    ; ...
+            [0.150  0.325   0.100]    ; ...
+            [0.300  0.180   0.100]    ; ...
+            [0.300  0.275   0.100]    ; ...
             ];
      
      
@@ -541,3 +581,18 @@ title('Bin Suction Cup Lip Points : "Pick point #: ABB Score"')
 xlim(plot_X_range)
 ylim(plot_Y_range)
 zlim(plot_Z_range)
+
+%----------------------------------------------------------------------
+%   Generate heat map
+
+% remove figure objects before saving
+
+clear f1 f2 f3 f4 f9b
+
+save result_test_Objects02
+disp('Please run ">> generateHeatMap01" manually....');
+
+%generateHeatMap01
+
+
+

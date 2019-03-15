@@ -32,7 +32,7 @@ for x=1:NOX,
         insert_y   = y + insert_ind_y;
         
         if (insert_x<=NWX) && (insert_y<=NWY),
-            new_world.Z(insert_y, insert_x)   = max( new_world.Z(insert_y, insert_x) , object.Z(y,x) );
+            new_world.Z(insert_y, insert_x)   = max( new_world.Z(insert_y, insert_x) , object.Z(y,x) + insert_pos(3) );
         end
     end
 end
