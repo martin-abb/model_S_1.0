@@ -9,13 +9,16 @@ load result_test_Objects02
 
 % Override suction cup params
 
-Suction.RO      = 15*mm/2
-Suction.RI      = 10*mm/2
-Suction.RM      = mean([ Suction.RO Suction.RI ])
+% Suction.RO      = 15*mm/2
+% Suction.RI      = 10*mm/2
+% Suction.RM      = mean([ Suction.RO Suction.RI ])
 
-NskipX          = 5%10;   % pixel spacing between pick points to evaluate
-NskipY          = 5%10;
+NskipX          = 3%10;   % pixel spacing between pick points to evaluate
+NskipY          = 3%10;
+%   size = 3 pixels takes 334 s for the 0.6 x 0.4 m bin at dx = 1 mm,
+%   27,000 points to evaluate
 
+Score_floor     = 0.20;         % score if suction lip completely on floor, i.e z = 0.00
 
 %----------------------------------------------------------------------
 %   Generate pick points for heat map
@@ -142,10 +145,24 @@ for pick_point_no = 1:N_pick,
         disp(' ');
     end
     
+
+%*** this doesn't work too well with the z-height pick point specification and the lip PC being extracted
+%*** from the translated PC
+%***if max(max(lipZ))<0.001, % check if suction cup lip on bin floor
+
+%**** instead, adjust with pick point height PZ
+    if max(max(lipZ + PZ))<0.001, % check if suction cup lip on bin floor
+        Std1            = 0.20;
+        Score_metric    = [1 1 1] * 0.20;
+    end
+
     PickMetrics(pick_point_no, 1)           = Std1;
     PickMetrics(pick_point_no, 2:4)         = Score_metric;
     
     Scores_ABB      = PickMetrics(:,2);
+    
+        
+    
     All_Metrics     = [ PickMetrics(:,2:4) ];
     
     
@@ -177,6 +194,8 @@ Image_M2           = reshape(M2, MY, MX)*63;
 %   Plot RAW heat maps
 fh2 = figure;
 image(Image_M2)
+ax=gca;
+set(ax, 'Ydir', 'normal');
 colormap hot
 title('RAW Heat Map')
 

@@ -46,7 +46,8 @@ dtheta          = 2*pi/100;
 
 deg             = pi/180;
 
-slope_factor    = 0.2;%***1;                    % tuning factor as to how fast the score changes from 1 to 0 in the transition
+%*** 2019-03-18  slope_factor    = 0.2;%***1;                    % tuning factor as to how fast the score changes from 1 to 0 in the transition
+slope_factor    = 0.02;%***1;                    % tuning factor as to how fast the score changes from 1 to 0 in the transition
 
 % region from low slope (dlipZ) to
 % high slope

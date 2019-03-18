@@ -209,6 +209,25 @@ switch world_ver,
         cylinder4   = Cylinder(0.050/2, 0.140, dx);
         cylinder4_insert_pos    =  [0.250 ; 0.250 ; 0.050/2];
         
+        %   calibration wedges with varying step in upper right part of bin
+
+        wedge6  = Wedge2(0.030,     0.060,  0.001,   slope*20,       version,    dx);
+        wedge6_insert_pos    = [0.250 ; 0.350-0.030 ; 0.000];
+        
+        wedge7  = Wedge2(0.030,     0.060,  0.002,   slope*20,       version,    dx);
+        wedge7_insert_pos    = [0.320 ; 0.350-0.030 ; 0.000];
+        
+        wedge8  = Wedge2(0.030,     0.060,  0.004,   slope*20,       version,    dx);
+        wedge8_insert_pos    = [0.390 ; 0.350-0.030 ; 0.000];
+        
+        wedge9  = Wedge2(0.030,     0.060,  0.008,   slope*20,       version,    dx);
+        wedge9_insert_pos    = [0.460 ; 0.350-0.030 ; 0.000];
+        
+        wedge10  = Wedge2(0.030,     0.060,  0.016,   slope*20,       version,    dx);
+        wedge10_insert_pos    = [0.530 ; 0.350-0.030 ; 0.000];
+        
+
+        
         world       = addObject( empty , wedge1, wedge1_insert_pos );
         world       = addObject( world , wedge2, wedge2_insert_pos );
         world       = addObject( world , wedge5, wedge5_insert_pos );
@@ -222,6 +241,11 @@ switch world_ver,
         world       = addObject( world , cylinder3, cylinder3_insert_pos );
         world       = addObject( world , cylinder3b, cylinder3b_insert_pos );
         world       = addObject( world , cylinder4, cylinder4_insert_pos );
+        world       = addObject( world , wedge6, wedge6_insert_pos );
+        world       = addObject( world , wedge7, wedge7_insert_pos );
+        world       = addObject( world , wedge8, wedge8_insert_pos );
+        world       = addObject( world , wedge9, wedge9_insert_pos );
+        world       = addObject( world , wedge10, wedge10_insert_pos );
         
         %----------------------------------------------------------------------
         %   Specify pick points
@@ -238,6 +262,11 @@ switch world_ver,
             [0.150  0.325   0.100]    ; ...
             [0.300  0.180   0.100]    ; ...
             [0.300  0.275   0.100]    ; ...
+            [ 0.250+0.030   0.350, 0.080] ; ...
+            [ 0.320+0.030   0.350, 0.080] ; ...
+            [ 0.390+0.030   0.350, 0.080] ; ...
+            [ 0.460+0.030   0.350, 0.080] ; ...
+            [ 0.530+0.030   0.350, 0.080] ; ...
             ];
      
      
@@ -527,6 +556,10 @@ for pick_point_no = 1:N_pick,
     text_z_offset   = 0.010;
     
     text_z          = max(all_lip_Z{pick_point_no});
+    
+    if isempty(text_z),
+        text_z = 0.0;
+    end
     
     t91a=text(PickPoints_Bin(pick_point_no,1) + text_x_offset, ...
         PickPoints_Bin(pick_point_no,2) + text_y_offset, ...
