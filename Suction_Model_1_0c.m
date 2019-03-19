@@ -1,4 +1,4 @@
-function Score_metric = Suction_Model_1_0c( lipX, lipY, lipZ, Suction, Object)
+function Score_metric = Suction_Model_1_0c( lipX, lipY, lipZ, Suction, Object,PickPoint_relative)
 %Suction_Model_1_0 Function implements the ABB Suction 1.0 model for
 % suction cup grasping.
 % Needs to be used in conjunction with function Lip_Complete_Check
@@ -177,18 +177,59 @@ std_lipZ                = std(lipZ_avg_tangential);     % overall standard devia
 %       apmlitude steps with low frequency content
 Score_amp               = max( 0, 1 - (std_lipZ / (3 * Suction.max_lipZ_amplitude) ) );
 
-%   2019-02-12  Calculate combined score
-Score                   = Score_amp * Score_freq;
 
-Score_metric            = [ Score Score_freq Score_amp ];   % return these metrics
+
+%-----------------------------------------------------------------------------------------
+%   Metrics for mass and mass distribution
+%
+%   Calculate average z-height of lip, use this as z-height for the pick
+%   point for lever arm calculations
+%
+%   Note that lipX, lipY, lipZ are input in RELATIVE COORDINATES, with
+%   respect to the pick point...
+%   pick point is at the origin so lipZ's will most likely be negative if
+%   pick point was specified to be above the object
+%
+%   May need to switch to absolute coordinates to account for proper pick
+%   point z-height and CM z-coordinate!!!
+
+avg_lipZ    = mean(lipZ);
+%   Pick Point
+% PZ          = avg_lipZ;
+% PX          = 0; %***mean(lipX);
+% PY          = 0; %***mean(lipY);
+
+%***P           = [ PX PY PZ ];
+P           = PickPoint_relative;   % relatvie to MIDPOINT of object
+RP          = P - Object.CM;
+FG          = [ 0 0 -Object.w ]';
+TM          = cross( RP , FG );
+
+TM_mag      = norm(TM);
+Score_TM    = max(0, (1 - TM_mag / Suction.TM_max)) ^ Suction.TM_factor;      % score component due to gravity torque
+
+Score_weight    = max(0, (1 - Object.w / Suction.F_max)) ^ Suction.gravity_factor;    % score component due to gravity force
+
+
+%-----------------------------------------------------------------------------------------
+%   
+
+
+%   2019-02-12  Calculate combined score
+%***Score                   = Score_amp * Score_freq;
+Score                   = Score_amp * Score_freq * Score_TM * Score_weight;
+
+Score_metric            = [ Score Score_freq Score_amp Score_TM Score_weight];   % return these metrics
 
 %   print for debug purposes
 if debug,
     
+    Score
     Score_freq
     Score_amp
-    Score
-    
+    Score_TM
+    Score_weight
+ 
 end
 
 %--------------------------------------------------------------------------

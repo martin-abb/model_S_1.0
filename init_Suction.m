@@ -14,8 +14,8 @@
 %in      = 0.0254;
 %mm      = 1e-3;
 
-Suction.RO      = 47/2*mm; %15/2*mm;  % 10*mm %*****47/2*mm;        %   Suction cup OUTER radius
-Suction.RI      = 35/2*mm; % 10/2*mm;  %7*mm %***35/2*mm;        %   Suction cup INNER radius, lip width approx. 5 mm
+Suction.RO      = 15/2*mm;  %47/2*mm; % 10*mm %*****47/2*mm;        %   Suction cup OUTER radius
+Suction.RI      = 10/2*mm;  %35/2*mm; % 7*mm %***35/2*mm;        %   Suction cup INNER radius, lip width approx. 5 mm
 
 
 Suction.RM      = mean([ Suction.RI Suction.RO]);    % mean suction cup lip radius
@@ -42,4 +42,13 @@ Suction.p_max   = 6*inHg;
 
 Suction.F_max   = Suction.A * Suction.p_max;
 Suction.m_max   = Suction.F_max / g;
+
+%***Suction.TM_max  = 0.500;        % [Nm]  Max allowed torque
+Suction.TM_max  = 0.300;        % [Nm]  Max allowed torque
+
+Suction.gravity_factor  = 1/4;      % [] Tuning factor for score dropoff due to item weight
+Suction.TM_factor       = 1/3;      % [] Tuning factor for score dropoff due to item torque
+
+%   Max acceleration used during picks
+Suction.a_max   = g;
 
