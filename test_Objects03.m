@@ -341,8 +341,6 @@ switch world_ver,
         box6.insert_pos     = [0.350 ; 0.250 ; 0];
         
         
-        
-        
         %         cylinder1   = Cylinder(0.050, 0.150, dx);
         %         cylinder1_insert_pos    =  [0.430 ; 0.200 ; 0];
         %

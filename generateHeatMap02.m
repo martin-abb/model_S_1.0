@@ -59,7 +59,7 @@ empty_object.W      = 0.050;
 empty_object.H      = 0.040;
 
 empty_object.m        = 0.000;                  % [kg]  object mass
-empty_object.w        = empty_object.m * g;             % [N]   object weight
+empty_object.w        = empty_object.m * g;     % [N]   object weight
 empty_object.CM_x     = 0.000;                  % [m]   relative CM position
 empty_object.CM_y     = 0.000;
 empty_object.CM_z     = empty_object.H/2;
