@@ -71,8 +71,8 @@ temp8   = ( temp4' * t1 )';
 object3 = [ temp5 ; temp6 ; temp7 ; temp8 ];
 
 %   Override Object 2 for tests
-disp('Overriding object2 with object3 !')
-object2     = object3;
+% disp('Overriding object2 with object3 !')
+% object2     = object3;
 
 %disp('Overriding object2 with RANDOM object !')
 %object2     = rand(size(object3));
