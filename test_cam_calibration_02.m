@@ -8,13 +8,17 @@
 %W1  = [0 0 0]'     % origin
 
 %W1  = [+50*mm 0 0]'     % origin
-%W1rel   = [0 0 0]'
+%W1rel   = [0.1 0.1 0]'
 %W1rel     = [ +0.3 +0.2 +0.0]'
 %W1rel   = [0.6 0 -0.3]'
-W1rel   = [0.3142 -0.5595 +0.0205]'
 
-W1  = [-50*mm 0 0]' + W1rel     % absolute world coordinate
-W1x = [ W1 ; 1]    % extended
+W1rel   = [0.3142 -0.5595 +0.0205]'         % bottom of bin corner
+%W1rel   = [0.2542 -0.5395 +0.4580]'         % top of bin corner
+
+%W1  = [-50*mm 0 0]' + W1rel     % absolute world coordinate
+W1  = [0 0 0]' + W1rel     % absolute world coordinate
+
+W1x = [ W1 ; 1];    % extended
 
 %--------------------------------------------------------------------
 %   Per Corke's definition
@@ -40,7 +44,7 @@ W1x = [ W1 ; 1]    % extended
 C       = CIM * CEM ; 
 ptilde  = C*W1x;
 
-Z       = ptilde(3)
+Z       = ptilde(3);
 p       = round( ptilde / Z );
 
 pixx      = p(1);
@@ -49,4 +53,7 @@ pixy      = p(2);
 
 disp('Pixel coordinates')
 disp([ 'pixx  = ' num2str(pixx) ', pixy = ' num2str(pixy) ', Z = ' num2str(Z) ])
+pixy_I = Iheight - pixy;
+disp([ 'Image y-coord = Iheight - pixy = ' num2str(pixy_I) ])
+
 

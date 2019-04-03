@@ -1,0 +1,74 @@
+Test of camera intrinsic & extrinsic matrices for Simulated World depth image processing
+
+
+test_cam_calibration_02
+
+W1rel =
+
+    0.3142
+   -0.5595
+    0.0205
+
+
+W1 =
+
+    0.3142
+   -0.5595
+    0.0205
+
+Pixel coordinates
+pixx  = 219, pixy = 596, Z = 1.4395
+Image y-coord = Iheight - pixy = 124
+pixX=pixx
+
+pixX =
+
+   219
+
+pixY=pixy
+
+pixY =
+
+   596
+
+Z
+
+Z =
+
+    1.4395
+
+inputDepth = Z
+
+inputDepth =
+
+    1.4395
+
+cameraIntrinsics = CIM; cameraPose=CEM;
+camX = (pixX-cameraIntrinsics(1,3)).*inputDepth/cameraIntrinsics(1,1);
+camY = (pixY-cameraIntrinsics(2,3)).*inputDepth/cameraIntrinsics(2,2);
+camZ = inputDepth;
+worldX = cameraPose(1,1) * camX + cameraPose(1,2) * camY + cameraPose(1,3) * camZ + cameraPose(1,4);
+worldY = cameraPose(2,1) * camX + cameraPose(2,2) * camY + cameraPose(2,3) * camZ + cameraPose(2,4);
+worldZ = cameraPose(3,1) * camX + cameraPose(3,2) * camY + cameraPose(3,3) * camZ + cameraPose(3,4);
+[worldX worldY worldZ]'
+
+ans =
+
+    0.3138
+   -0.5601
+    0.0205
+
+W1
+
+W1 =
+
+    0.3142
+   -0.5595
+    0.0205
+
+Z
+
+Z =
+
+    1.4395
+

@@ -11,6 +11,7 @@
 
 mm  = 1e-3;
 Lx  = -50.0*mm;      % [mm]  Camera location
+Lx=0    % Does this correspond to the images? They look very symmetric, both along x and y
 Ly  = 0.0*mm;
 Lz  = -1460.0*mm;
 L   = [ Lx ; Ly ; Lz ];
@@ -34,7 +35,16 @@ img_raw_depth   = imread('s00000050Depth.png');%'b00000002d.png');
 %   Convert depth image
 
 depth_scale     = 22e-6%* 2;     % Note! Simulated object size is 2x real object size
-inputDepth      = -double(img_raw_depth)*depth_scale + Lz;
+%***inputDepth      = -double(img_raw_depth)*depth_scale + Lz;
+%inputDepth      = +double(img_raw_depth)*depth_scale - Lz;
+%inputDepth      = +double(img_raw_depth)*depth_scale + Lz;
+
+% disp('Using custom depth map conversion: 0.8 - img_raw*depth_scale')
+% inputDepth      = 0.8 - double(img_raw_depth)*depth_scale;
+
+% DOESN'T WORK inputDepth      = -double(img_raw_depth)*depth_scale - Lz;
+
+inputDepth      = +double(img_raw_depth)*depth_scale - Lz/2;
 
 %----------------------------------------------------------------------
 %  Plot the loaded image data
@@ -118,17 +128,20 @@ CIM = K * M2;
 
 s2  = 1 / sqrt(2);
 Q1  = quaternion(s2,0,s2,0);
-R1  = rotmat(Q1,'frame');
+%R1  = rotmat(Q1,'frame');
 
 %R1  = [-1 0 0 ; 0 1 0 ; 0 0 +1]';
-R1  = eye(3);
+%R1  = eye(3);
+
+%R1      = [ 0 1 0 ; 1 0 0 ; 0 0 -1]';   % Frol's camera orientation
+R1      = [ 0 1 0 ; 1 0 0 ; 0 0 -1];   % Frol's camera orientation
 
 %cameraPose  = [ R1 L ; 0 0 0 1];
 CEM  = [ R1 -L ; 0 0 0 1];
 
 %----------------------------------------------------------------------
 
-[worldX,worldY, worldZ] = project_D_to_XYZ(inputDepth,CIM',CEM);
+[worldX,worldY, worldZ] = project_D_to_XYZ(inputDepth,CIM,CEM);
 
 %----------------------------------------------------------------------
 f5=figure;
