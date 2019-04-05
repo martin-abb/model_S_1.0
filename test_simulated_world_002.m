@@ -31,10 +31,14 @@ img_raw_color   = imread('s00000050.png');%'b00000002.png');
 img_raw_depth   = imread('s00000050Depth.png');%'b00000002d.png');
 
 
+% img_raw_color   = imread('j00000006.png');%'b00000002.png');
+% img_raw_depth   = imread('j00000006d.png');%'b00000002d.png');
+% 
+
 %----------------------------------------------------------------------
 %   Convert depth image
 
-depth_scale     = 22e-6%* 2;     % Note! Simulated object size is 2x real object size
+depth_scale     = 22e-6/3%* 2;     % Note! Simulated object size is 2x real object size
 %***inputDepth      = -double(img_raw_depth)*depth_scale + Lz;
 %inputDepth      = +double(img_raw_depth)*depth_scale - Lz;
 %inputDepth      = +double(img_raw_depth)*depth_scale + Lz;
@@ -44,7 +48,7 @@ depth_scale     = 22e-6%* 2;     % Note! Simulated object size is 2x real object
 
 % DOESN'T WORK inputDepth      = -double(img_raw_depth)*depth_scale - Lz;
 
-inputDepth      = +double(img_raw_depth)*depth_scale - Lz/2;
+inputDepth      = +double(img_raw_depth)*depth_scale + 0.5; %- Lz/2;
 
 %----------------------------------------------------------------------
 %  Plot the loaded image data
@@ -124,7 +128,7 @@ CIM = K * M2;
 
 %cameraPose          = load('simulated_world-camera-pose.txt','ascii');
 
-%   Quaterion format of camera extrinsic matrix
+%   Quaternion format of camera extrinsic matrix
 
 s2  = 1 / sqrt(2);
 Q1  = quaternion(s2,0,s2,0);

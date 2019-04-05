@@ -1,0 +1,50 @@
+>> pwd
+
+ans =
+
+    'C:\Users\USMAKRU\OneDrive - ABB\2018\Logistics\Suction Cup Modeling\Suction_1.0_ML'
+
+>> what
+
+MATLAB Code files in the current folder C:\Users\USMAKRU\OneDrive - ABB\2018\Logistics\Suction Cup Modeling\Suction_1.0_ML
+
+Box                                  filter_depth_exp                     
+Click_Pick_Points                    generateHeatMap01                    
+Comparison01                         generateHeatMap02                    
+Comparison02                         generateHeatMap_simulated_world_001  
+Comparison03                         import_summary                       
+Comparison04                         importfile_yaml                      
+Comparison05                         init_Bin                             
+Compute_Statistics01                 init_Objects                         
+Cylinder                             init_Suction                         
+Experimental01                       mk_str                               
+Extract_Lip                          plot_wedge                           
+Extract_Lip2                         project_D_to_XYZ                     
+Filter_Bin_Pick_Points               project_D_to_XYZ_single_pixel        
+Generate_Pick_Points                 project_XYZ_to_D                     
+Image_Block_Expand                   test10                               
+Lip_Complete_Check                   test11                               
+Sort_Lip_Z                           test12                               
+Sphere                               test13                               
+Suction_Model_1_0                    test8                                
+Suction_Model_1_0b                   test9                                
+Suction_Model_1_0c                   test_Objects                         
+Transform_PC                         test_Objects02                       
+Wedge                                test_Objects03                       
+Wedge2                               test_Suction_Cup_2D_01               
+addObject                            test_Suction_Cup_2D_02               
+circle                               test_Suction_Model_1_0_v001          
+circle2                              test_Wedge                           
+create_PC_from_data                  test_cam_calibration                 
+debug_001                            test_cam_calibration_02              
+draw_CM                              test_simulated_world_001             
+draw_CM2                             test_simulated_world_002             
+filter_depth                         
+
+MAT-files in the current folder C:\Users\USMAKRU\OneDrive - ABB\2018\Logistics\Suction Cup Modeling\Suction_1.0_ML
+
+Blist                             result_test_Objects02             
+heatMap_simulated_world_001       result_test_Objects03             
+heatMap_simulated_world_002_soap  statistics_221_to_4               
+heatmap10_results                 
+
