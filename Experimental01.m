@@ -22,7 +22,7 @@ plot_PC_overlay = 0;
 
 
 base_dir_local  = 'C:\Users\USMAKRU\OneDrive - ABB\2018\Logistics\Suction Cup Modeling\Suction_1.0_ML';
-data_dir_local  = 'C:\Users\USMAKRU\Documents\ABB Local\Intel RealSense\Tests_2019_03_13';
+data_dir_local  = 'C:\Users\USMAKRU\OneDrive - ABB\2018\Logistics\Suction Cup Modeling\Suction_1.0_ML\C_RS_D415_Calibration';
 base_dir        = base_dir_local;
 data_dir        = data_dir_local;
 
@@ -50,38 +50,47 @@ Std_Bad      = 0.150; %***0.030;           % standard deviation for pick points 
 %   Load sensor data images for testing
 %
 
-cameraIntrinsics    = load('test-camera-intrinsics.txt','ascii');
+load cameraParams01
+
+cameraIntrinsics    = cameraParams01.IntrinsicMatrix';
+%*** Note! The scritp
+% project_D_to_XYZ requires the TRANSPOSED intrinsic matrix
+
 % cameraPose          = load('test-camera-pose.txt','ascii');
 % 0.9999    0.0115    0.0050    0.1189
 % 0.0062   -0.8006    0.5991   -0.1604
 % 0.0109   -0.5990   -0.8006    0.7012
 % 0         0         0    1.0000
 
-cameraPos           = [ 0.30; 0.03 ; 1.02];     % test camera position
+%   use Calibration image #6 : filename "Calib07_color.png"
+cameraPos           = +cameraParams01.TranslationVectors(6,:)';     % test camera position
+
 %cameraR             = [ 1  0  0 ; 0  1  0 ; 0  0  -1 ]; % test camera rotation, pointing downwards
-cameraR             = [ 1  0  0 ; 0  -1  0 ; 0  0  -1 ]; % test camera rotation, pointing downwards
-%cameraR             = [ 1  0  0 ; 0  -1  0 ; 0  0  -11 ]; % test camera rotation, pointing downwards
+cameraR             = cameraParams01.RotationMatrices(:,:,6); % test camera rotation, pointing downwards
+
+disp('Flipping camera Z-axis')
+cameraR(3,3)        = -1;
+
 cameraPose          = [ cameraR   cameraPos; 0 0 0 1];
 
 
-depth_scale     = 1/10^4;
+%***depth_scale     = 1/10^4;
 
 N_metrics           = 4;    % number of metrics to record for each pick point
 
-img_name        = '0004_';
-
-img_raw_color   = imread([ data_dir '\' img_name 'Color.png' ]);
-img_raw_depth   = imread([ data_dir '\' img_name 'Depth.png' ]);
+img_raw_color   = imread([ data_dir '\Scene01_Color.png' ]);
+img_raw_depth   = imread([ data_dir '\Scene01_holefill_Depth.png' ]);
 
 %----------------------------------------------------------------------
 %   Convert depth image
 
 
 %inputDepth      = double(img_raw_depth)*depth_scale;
-x_min           = 0.8;
-x_max           = 1.2;
+z_min           = 500;  % *** WHITE color, value 255
+z_max           = 900;  % *** BLACK color, value 0
 
-inputDepth      = double(img_raw_depth(:,:,1))/255 * (x_max - x_min) + x_min;
+%inputDepth      = double(img_raw_depth(:,:,1))/255 * (z_max - z_min) + z_min;
+inputDepth      = double(img_raw_depth(:,:,1))/255 * (z_min - z_max) + z_max;
 
 %----------------------------------------------------------------------
 %  Plot the loaded image data
@@ -112,11 +121,16 @@ axis equal
 
 
 
-d_move_back     = 1.4;%8.0;   %   Move back distance
-inputDepth_filtered     = filter_depth_exp( inputDepth, d_move_back);
+if 0,
+    d_move_back     = 1.4;%8.0;   %   Move back distance
+    inputDepth_filtered     = filter_depth_exp( inputDepth, d_move_back);
+else
+    inputDepth_filtered     =  inputDepth;
+end
+
 
 % img_filtered_depth = inputDepth_filtered / depth_scale;      % create filtered depth image map
-% 
+%
 % if 0,
 %     %----------------------------------------------------------------------
 %     f3=figure;
@@ -133,7 +147,7 @@ inputDepth_filtered     = filter_depth_exp( inputDepth, d_move_back);
 
 %----------------------------------------------------------------------
 
-if 1,
+if 0,
     
     f5=figure;
     cld_world   = plot3(worldX, worldY, worldZ, 'k.');
@@ -144,10 +158,43 @@ if 1,
     xlabel('x')
     ylabel('y')
     title('World 3D Point Cloud')
+else
+    f5=figure;
+    
+    PC1(:,:,1)=worldX;
+    PC1(:,:,2)=worldY;
+    PC1(:,:,3)=worldZ;
+    
+    pcshow(PC1)
+    axis equal
+    xlabel('x')
+    ylabel('y')
+    title('World 3D Point Cloud')
     
 end
 
 cd(base_dir)
+
+disp('Ending script')
+return
+
+%----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+
+%----------------------------------------------------------------------
+
+
 
 PickPoints_Bin_RAW = tote_file_contents(:,1:3);
 
