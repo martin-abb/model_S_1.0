@@ -31,8 +31,8 @@ end
 % Suction.RI      = 10*mm/2
 % Suction.RM      = mean([ Suction.RO Suction.RI ])
 
-NskipX          = 10%10;   % pixel spacing between pick points to evaluate
-NskipY          = 10%10;
+NskipX          = 100%10;   % pixel spacing between pick points to evaluate
+NskipY          = 100%10;
 %   size = 3 pixels takes 334 s for the 0.6 x 0.4 m bin at dx = 1 mm,
 %   27,000 points to evaluate
 
@@ -170,7 +170,7 @@ for pick_point_no = 1:N_pick,
 
 %**** instead, adjust with pick point height PZ
     if max(max(lipZ + PZ))<0.001, % check if suction cup lip on bin floor
-        Std1            = 0.20;
+        Std1            = Score_floor;
         Score_metric    = [1 1 1] * 0.20;
     end
 

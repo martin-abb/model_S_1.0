@@ -92,10 +92,33 @@ z_max           = 900;  % *** BLACK color, value 0
 %inputDepth      = double(img_raw_depth(:,:,1))/255 * (z_max - z_min) + z_min;
 inputDepth      = double(img_raw_depth(:,:,1))/255 * (z_min - z_max) + z_max;
 
+
+img_empty_depth   = imread([ data_dir '\Empty01_Depth.png' ]);
+emptyDepth      = double(img_empty_depth(:,:,1))/255 * (z_min - z_max) + z_max;
+
+%----------------------------------------------------------------------
+%   Remove empty bin background height
+
+zdiff = inputDepth - emptyDepth;
+inputDepth = zdiff + cameraPos(3);  % add back bin floor offset depth in cameraPos(3)
+
+zdiff_raw = img_raw_depth - img_empty_depth;
+
+%----------------------------------------------------------------------
+figure
+image(img_empty_depth)
+title('Empty Bin')
+axis equal
+
+%----------------------------------------------------------------------
+figure
+image(zdiff_raw*5)
+title('Depth Image Difference * 5')
+axis equal
+
+
 %----------------------------------------------------------------------
 %  Plot the loaded image data
-
-
 
 
 %----------------------------------------------------------------------
@@ -167,6 +190,9 @@ else
     
     pcshow(PC1)
     axis equal
+    ax=gca;
+    set(ax,'YDir','reverse')
+    view(170,60)
     xlabel('x')
     ylabel('y')
     title('World 3D Point Cloud')
