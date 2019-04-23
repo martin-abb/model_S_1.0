@@ -10,19 +10,19 @@
 
 m(1)        = 1;
 k(1)        = 10;
-kv(1)       = 1;
+kv(1)       = 10;
 
 m(2)        = 1;
 k(2)        = 10;
-kv(2)       = 1;
+kv(2)       = 10;
 
 m(3)        = 1;
 k(3)        = 10;
-kv(3)       = 1;
+kv(3)       = 10;
 
 m(4)        = 1;
 k(4)        = 10;
-kv(4)       = 1;
+kv(4)       = 10;
 
 %kv = [0 0 0 0]
 %k  = [0 0 0 0]
@@ -80,10 +80,11 @@ sysC.OutputName = { 'y1', 'y2', 'y3', 'y4' };
 
 sysD        = c2d(sysC, Ts);
 
-%   Define lip
+%   Define object the lip will land on
 
 
-obj       = [2 1 1.4 1.3]';
+%obj       = [2 1 1.4 1.3]';
+obj       = [10 0 0 10]';
 
 objmax    = max(obj);
 lip0    = objmax*1.1;
@@ -92,8 +93,10 @@ x       = x0;
 figure
 hold on
 plot(obj, 'r');
+all_y   = [];
+all_t = (0:500);
 
-for t=1:50000,
+for t=(all_t+1),
     disp(t)
     y       = sysD.C * x;
     plot(y)
@@ -109,8 +112,18 @@ for t=1:50000,
     end
 
     x = xnext;
-    pause
+    
+    all_y(:,t) = y;
+    
+ %   pause
 end
 
     
+figure
+stairs(all_t, all_y')
+xlabel('t')
+ylabel('y [m]')
+title('Suction cup lip mass particle positions [m]')
+
+
     
