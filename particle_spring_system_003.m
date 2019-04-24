@@ -1,5 +1,5 @@
 %
-%   particle_spring_system_002.m
+%   particle_spring_system_003.m
 %
 %   Martin Krucinski
 %
@@ -9,16 +9,15 @@
 %
 %   2019-04-23  v002    2nd version with auto-generation of A-matrix for
 %                       systems with arbitrary sizes
+%
+%   2019-04-24  v003    With animation feature
 
-Nlip        = 900;150%100;      % number of points along the lip
-
-% Ts          = 0.1;
-% t_final     = 30;          % simulation end timeTs          = 0.1;
-
-Ts          = 20.0;
-t_final     = 10000;          % simulation end time
-
+Nlip        = 150%100;      % number of points along the lip
+Ts          = 0.1;
+t_final     = 30;          % simulation end time
 Nt          = round(t_final / Ts);           % number of time-points
+
+make_movies     = true;
 
 g           = 9.81;
 
@@ -27,24 +26,11 @@ m           = zeros(Nlip,1);
 k           = zeros(Nlip,1);
 kv          = zeros(Nlip,1);
 
-m0          = 1/6%1; % nominal mass
-dh          = 1; % nominal object surface feature height
-k0          = 0.1 * m0 * g * Nlip^2 / 2 / dh
-kv0         = 100/6 %100;
-
 
 for i = 1:Nlip,
-    %     m(i)        = 1;
-    %     k(i)        = 1e5;%100;%1000;%0;%10;
-    %     kv(i)       = 100;%0.1; %**10
-    
-    m(i)        = m0;
-    k(i)        = 10;
-    kv(i)       = kv0;%0.1; %**10
-    
-%     m(i)        = m0;
-%     k(i)        = k0;
-%     kv(i)       = kv0;%0.1; %**10
+    m(i)        = 1;
+    k(i)        = 1e4;%3000;%1000;%0;%10;
+    kv(i)       = 100;%0.1; %**10
 end
 
 
@@ -74,7 +60,7 @@ A               = zeros(N,N);
 for i = 1:Nlip,
     
     ix      = 1 + (i-1)*2;
-%    ic      = (ix-1);
+    %    ic      = (ix-1);
     %   odd ix
     A(ix,ix:(ix+1))  = [  0 1 ];
     A(ix+1,ix+1)    = -kv(i) / m(i);
@@ -144,35 +130,41 @@ id1         = round(0.50*Nlip);
 id2         = round(0.75*Nlip);
 
 obj(id1) = 0.8;
-obj(id1+1) = 0.8;
-obj(id1+2) = 0.8;
-
 obj(id2) = 0.95;
-obj(id2+1) = 0.95;
-obj(id2+2) = 0.95;
 
-obj         = obj * 1000;
+objmax      = max(obj);
+objmin      = min(obj);
 
-objmax    = max(obj);
 lip0    = objmax * 1.02; %***1.1;
 %x0      = [lip0 0 lip0 0 lip0 0 lip0 0]';
 x0      = lip0 * repmat([1 ; 0], Nlip, 1);
 
 x       = x0;
-figure
+f1 = figure;
+
+
+ylim([ objmin - 0.1*objmax objmax*1.1 ]);
 hold on
-plot(obj, 'r');
+
 all_y   = [];
 
 all_t = Ts*(0:(Nt-1))';
+
+if make_movies,
+    vWriter = VideoWriter('Robot_Movie','MPEG-4');	% initialize vide capture of simulation frames
+    open(vWriter);									% open movie file
+    
+end
 
 disp('Starting simulation...')
 
 for t=1:Nt,
     disp(all_t(t))
     y       = sysD.C * x;
-    plot(y)
-%    xprev   = x;
+    plot(y,'bo-')
+    p1=plot(obj, 'r');
+    set(p1,'LineWidth',3);
+    %    xprev   = x;
     xnext   = sysD.A * x + sysD.B * 1;
     ynext   = sysD.C * xnext;
     for i=1:Nlip,
@@ -182,15 +174,33 @@ for t=1:Nt,
             xnext(ix+1)     = 0;        % set mass particle velocity to zero
         end
     end
-
+    
     x = xnext;
     
     all_y(:,t) = y;
     
- %   pause
+    if make_movies,
+        text(t_final/2, lip0 * 1.1, num2str(all_t(t)));
+        
+        Robot_Figure		= getframe(f1);		% Capture screenshot image of figure
+        Robot_Image			= Robot_Figure.cdata;
+        cla
+        writeVideo(vWriter, Robot_Image);			% Write screenshot image to video file
+        
+        
+    end
+    
+    
+    
+    %   pause
 end
 
-    
+
+if make_movies,
+    close(vWriter)			% Close robot simulation video file
+end
+
+%--------------------------------------------------------------------------
 figure
 stairs(all_t, all_y')
 xlabel('t')
@@ -198,4 +208,3 @@ ylabel('y [m]')
 title('Suction cup lip mass particle positions [m]')
 
 
-    
